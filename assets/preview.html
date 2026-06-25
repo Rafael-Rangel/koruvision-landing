@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KORUVISION — Preview Assets Landing</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #000; color: #F0F4FF;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 2rem 2rem 4rem;
+    }
+    .brand-bar {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 2rem; padding-bottom: 1.5rem;
+      border-bottom: 1px solid #1E2940;
+    }
+    .brand-bar img { height: 48px; width: auto; border-radius: 8px; }
+    .brand-bar h1 {
+      font-size: 1.25rem; font-weight: 700;
+      background: linear-gradient(90deg, #FFB700, #9D4EDD);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .brand-bar p { color: #8B9EC4; font-size: 0.85rem; margin-top: 0.2rem; }
+    .notice {
+      background: #12121A; border: 1px solid #7B2CBF44;
+      border-radius: 10px; padding: 1rem 1.25rem;
+      margin-bottom: 2rem; font-size: 0.9rem; color: #8B9EC4;
+    }
+    .notice strong { color: #FFB700; }
+    h2 {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: #9D4EDD; margin: 2rem 0 1rem; font-weight: 600;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
+    .card {
+      background: #0A0A0F; border-radius: 12px; overflow: hidden;
+      border: 1px solid #1E2940; cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .card:hover {
+      transform: translateY(-2px); border-color: #9D4EDD;
+      box-shadow: 0 8px 32px rgba(157,78,221,0.15);
+    }
+    .card img {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover;
+      display: block; background: #000;
+    }
+    .card.square img { aspect-ratio: 1; }
+    .card.portrait img { aspect-ratio: 3/4; }
+    .card.tall img { aspect-ratio: 9/16; }
+    .card.pending { opacity: 0.5; cursor: default; }
+    .card.pending:hover { transform: none; border-color: #1E2940; box-shadow: none; }
+    .info { padding: 0.75rem 1rem; }
+    .id { font-size: 0.72rem; color: #FFB700; font-weight: 700; }
+    .name { font-size: 0.82rem; color: #8B9EC4; margin-top: 0.2rem; word-break: break-all; }
+    .tag {
+      display: inline-block; margin-top: 0.35rem; font-size: 0.65rem;
+      padding: 0.15rem 0.45rem; border-radius: 4px;
+      background: #7B2CBF33; color: #9D4EDD;
+    }
+    .tag.figma { background: #FFB70022; color: #FFB700; }
+    .tag.pillow { background: #10B98122; color: #10B981; }
+
+    .lightbox {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.96);
+      display: flex; flex-direction: column;
+      opacity: 0; visibility: hidden; transition: opacity 0.2s, visibility 0.2s;
+    }
+    .lightbox.open { opacity: 1; visibility: visible; }
+    .lb-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.5rem;
+    }
+    .lb-title .id { font-size: 0.85rem; color: #FFB700; }
+    .lb-title .name { font-size: 0.95rem; color: #F0F4FF; margin-top: 0.15rem; }
+    .lb-counter { font-size: 0.85rem; color: #4B5E80; margin-left: 1rem; }
+    .lb-close {
+      width: 40px; height: 40px; border: none; border-radius: 8px;
+      background: #12121A; color: #F0F4FF; font-size: 1.4rem; cursor: pointer;
+    }
+    .lb-close:hover { background: #9D4EDD; }
+    .lb-body {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      position: relative; padding: 0 4rem;
+    }
+    .lb-body img {
+      max-width: 100%; max-height: calc(100vh - 130px);
+      object-fit: contain; border-radius: 8px;
+      box-shadow: 0 24px 80px rgba(157,78,221,0.2);
+    }
+    .nav-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 48px; height: 48px; border: none; border-radius: 50%;
+      background: #12121Acc; color: #F0F4FF; font-size: 1.5rem;
+      cursor: pointer; backdrop-filter: blur(8px);
+    }
+    .nav-btn:hover { background: #9D4EDD; }
+    .nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+    .nav-prev { left: 1rem; }
+    .nav-next { right: 1rem; }
+    .click-zone { position: absolute; top: 0; bottom: 0; width: 28%; z-index: 5; cursor: pointer; }
+    .click-zone.prev { left: 0; }
+    .click-zone.next { right: 0; }
+    .lb-footer {
+      padding: 0.75rem; text-align: center; font-size: 0.78rem; color: #4B5E80;
+    }
+    .lb-footer kbd { background: #12121A; padding: 0.1rem 0.4rem; border-radius: 4px; }
+    .stats { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+    .stat { font-size: 0.85rem; color: #8B9EC4; }
+    .stat span { color: #FFB700; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="brand-bar">
+    <img src="refs/koruvision-logo-master.png" alt="KORUVISION" />
+    <div>
+      <h1>KORUVISION — Preview de Assets</h1>
+      <p>FlowIA Landing · FLUX.2 Pro + identidade roxo/ouro · Clique para slideshow</p>
+    </div>
+  </div>
+
+  <div class="notice">
+    <strong>Qualidade:</strong> mãos removidas/evitadas em I-05/I-07; logo KORUVISION sempre via PNG oficial (M-01).
+    Textos de UI em PT-BR; termos SaaS em inglês permitidos (Dashboard, CRM, Kanban, Chat).
+    <br /><strong>Mockups UI (I-09 a I-13):</strong> serão criados no Figma/React — não gerados por IA.
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div id="sections"></div>
+
+  <div class="lightbox" id="lightbox">
+    <div class="lb-header">
+      <div style="display:flex;align-items:center">
+        <div class="lb-title">
+          <div class="id" id="lb-id"></div>
+          <div class="name" id="lb-name"></div>
+        </div>
+        <div class="lb-counter" id="lb-counter"></div>
+      </div>
+      <button class="lb-close" id="lb-close">&times;</button>
+    </div>
+    <div class="lb-body">
+      <button class="nav-btn nav-prev" id="lb-prev">&#8249;</button>
+      <div class="click-zone prev" id="zone-prev"></div>
+      <img id="lb-img" src="" alt="" />
+      <div class="click-zone next" id="zone-next"></div>
+      <button class="nav-btn nav-next" id="lb-next">&#8250;</button>
+    </div>
+    <div class="lb-footer"><kbd>←</kbd> anterior · <kbd>→</kbd> próximo · <kbd>Esc</kbd> fechar</div>
+  </div>
+
+  <script>
+    const SECTIONS = [
+      {
+        title: "Hero — Backgrounds (S01)",
+        items: [
+          { id: "I-01", file: "hero-bg-glow.webp" },
+          { id: "I-02", file: "hero-particles.webp" },
+          { id: "I-03", file: "hero-noise-texture.webp", cls: "square" },
+          { id: "I-04", file: "hero-product-env.webp" },
+        ],
+      },
+      {
+        title: "Problema / Dor (S02)",
+        items: [
+          { id: "I-05", file: "pain-whatsapp-chaos.webp", cls: "portrait" },
+          { id: "I-06", file: "pain-spreadsheet-chaos.webp", cls: "portrait" },
+          { id: "I-07", file: "pain-chatbot-generic.webp", cls: "portrait" },
+          { id: "I-08", file: "pain-empty-pipeline.webp", cls: "portrait" },
+        ],
+      },
+      {
+        title: "Mockup App — Logo oficial (M-01)",
+        items: [
+          { id: "M-01", file: "mockup-koruvision-app.webp", cls: "portrait", tag: "pillow" },
+        ],
+      },
+      {
+        title: "Mockups UI — Figma/React (S04) · pendente",
+        items: [
+          { id: "I-09", file: null, label: "mockup-whatsapp.webp", pending: true, tag: "figma" },
+          { id: "I-10", file: null, label: "mockup-ai-agent.webp", pending: true, tag: "figma" },
+          { id: "I-11", file: null, label: "mockup-kanban.webp", pending: true, tag: "figma" },
+          { id: "I-12", file: null, label: "mockup-calendar.webp", pending: true, tag: "figma" },
+          { id: "I-13", file: null, label: "mockup-dashboard.webp", pending: true, tag: "figma" },
+        ],
+      },
+      {
+        title: "Demo Plates — fundos para composição UI",
+        items: [
+          { id: "D-01", file: "demo-plate-messaging.webp", cls: "tall" },
+          { id: "D-02", file: "demo-plate-dashboard.webp" },
+          { id: "D-03", file: "demo-plate-ambient.webp" },
+        ],
+      },
+      {
+        title: "Lifestyle Antes / Depois (S11)",
+        items: [
+          { id: "I-14", file: "lifestyle-before.webp" },
+          { id: "I-15", file: "lifestyle-after.webp" },
+        ],
+      },
+      {
+        title: "Cases por Vertical (S12)",
+        items: [
+          { id: "I-16", file: "case-clinic.webp" },
+          { id: "I-17", file: "case-realestate.webp" },
+          { id: "I-18", file: "case-consulting.webp" },
+          { id: "I-19", file: "case-agency.webp" },
+          { id: "I-20", file: "case-ecommerce.webp" },
+        ],
+      },
+      {
+        title: "Abstratos / Decorativos",
+        items: [
+          { id: "I-21", file: "abstract-dataflow.webp" },
+          { id: "I-22", file: "abstract-neural-network.webp" },
+          { id: "I-23", file: "abstract-orbital-system.webp" },
+          { id: "I-24", file: "abstract-growth-success.webp" },
+          { id: "I-25", file: "abstract-security-shield.webp", cls: "square" },
+        ],
+      },
+      {
+        title: "Avatares Testimonials (S13)",
+        items: [
+          { id: "I-26", file: "avatar-clinic-owner.webp", cls: "square" },
+          { id: "I-27", file: "avatar-sales-consultant.webp", cls: "square" },
+          { id: "I-28", file: "avatar-agency-founder.webp", cls: "square" },
+          { id: "I-29", file: "avatar-real-estate.webp", cls: "square" },
+        ],
+      },
+      {
+        title: "Backgrounds de Seção",
+        items: [
+          { id: "I-30", file: "bg-problem-section.webp" },
+          { id: "I-31", file: "bg-benefits-section.webp" },
+          { id: "I-32", file: "bg-cta-final.webp" },
+        ],
+      },
+    ];
+
+    const gallery = SECTIONS.flatMap(s => s.items.filter(i => i.file && !i.pending));
+
+    function cardHtml(item) {
+      if (item.pending) {
+        return `<div class="card pending ${item.cls||''}">
+          <div style="aspect-ratio:16/9;background:#12121A;display:flex;align-items:center;justify-content:center;color:#4B5E80;font-size:0.8rem">Figma/React</div>
+          <div class="info"><div class="id">${item.id}</div><div class="name">${item.label}</div><span class="tag figma">pendente</span></div>
+        </div>`;
+      }
+      const idx = gallery.findIndex(g => g.id === item.id);
+      return `<div class="card ${item.cls||''}" data-idx="${idx}" role="button" tabindex="0">
+        <img src="images/${item.file}" alt="${item.id}" loading="lazy" onerror="this.parentElement.classList.add('pending');this.style.display='none'" />
+        <div class="info"><div class="id">${item.id}</div><div class="name">${item.file}</div><span class="tag ${item.tag||''}">${item.tag === 'pillow' ? 'Pillow + logo oficial' : 'FLUX.2 Pro'}</span></div>
+      </div>`;
+    }
+
+    document.getElementById("sections").innerHTML = SECTIONS.map(s => `
+      <h2>${s.title}</h2>
+      <div class="grid">${s.items.map(cardHtml).join("")}</div>
+    `).join("");
+
+    document.getElementById("stats").innerHTML = `
+      <div class="stat"><span>${gallery.length}</span> imagens</div>
+      <div class="stat"><span>1</span> mockup app (Pillow)</div>
+      <div class="stat"><span>5</span> mockups UI (Figma)</div>
+      <div class="stat">Identidade <span>KORUVISION</span></div>
+    `;
+
+    let cur = 0;
+    const lb = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lb-img");
+
+    function show(i) {
+      cur = (i + gallery.length) % gallery.length;
+      const g = gallery[cur];
+      lbImg.src = `images/${g.file}?t=${Date.now()}`;
+      lbImg.alt = g.id;
+      document.getElementById("lb-id").textContent = g.id;
+      document.getElementById("lb-name").textContent = g.file;
+      document.getElementById("lb-counter").textContent = `${cur + 1} / ${gallery.length}`;
+      document.getElementById("lb-prev").disabled = cur === 0;
+      document.getElementById("lb-next").disabled = cur === gallery.length - 1;
+    }
+
+    function open(i) { show(i); lb.classList.add("open"); document.body.style.overflow = "hidden"; }
+    function close() { lb.classList.remove("open"); document.body.style.overflow = ""; }
+    function prev() { if (cur > 0) show(cur - 1); }
+    function next() { if (cur < gallery.length - 1) show(cur + 1); }
+
+    document.querySelectorAll(".card[data-idx]").forEach(el => {
+      el.addEventListener("click", () => open(+el.dataset.idx));
+      el.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(+el.dataset.idx); }
+      });
+    });
+    document.getElementById("lb-close").onclick = close;
+    document.getElementById("lb-prev").onclick = e => { e.stopPropagation(); prev(); };
+    document.getElementById("lb-next").onclick = e => { e.stopPropagation(); next(); };
+    document.getElementById("zone-prev").onclick = prev;
+    document.getElementById("zone-next").onclick = next;
+    lb.onclick = e => { if (e.target === lb) close(); };
+    document.onkeydown = e => {
+      if (!lb.classList.contains("open")) return;
+      if (e.key === "Escape") close();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+run = "npm run dev"
+entrypoint = "app/page.tsx"
+hidden = [".config", "package-lock.json", "node_modules"]
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "npm run build && npm run start"]
+deploymentTarget = "cloudrun"
+build = ["npm", "install"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80

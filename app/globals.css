@@ -1,0 +1,176 @@
+@import "../styles/tokens.css";
+@import "../styles/landing.css";
+@import "../styles/sections-ext.css";
+@import "../styles/experience.css";
+@import "../styles/premium-refinement.css";
+@import "../styles/landing-v10.css";
+@import "../styles/landing-nv11.css";
+
+html { scroll-behavior: auto; }
+
+body {
+  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  background: #03060F;
+  color: #F0F4FF;
+  overflow-x: hidden;
+}
+
+main { position: relative; z-index: 2; }
+
+/* —— v6: hierarquia conteúdo > mídia —— */
+.pin-wrap {
+  position: relative;
+  isolation: isolate;
+}
+
+.pin-section {
+  position: relative;
+  isolation: isolate;
+}
+
+.section-inner,
+.section-flow > .section-inner {
+  position: relative;
+  z-index: 10;
+}
+
+.section-content-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    rgba(3, 6, 15, 0.94) 0%,
+    rgba(3, 6, 15, 0.72) 38%,
+    rgba(3, 6, 15, 0.45) 62%,
+    rgba(3, 6, 15, 0.55) 100%
+  );
+}
+
+.section-content-veil--hero {
+  background: linear-gradient(
+    90deg,
+    rgba(3, 6, 15, 0.92) 0%,
+    rgba(3, 6, 15, 0.5) 42%,
+    rgba(3, 6, 15, 0.25) 100%
+  );
+}
+
+.section-content-veil--problem {
+  background: linear-gradient(
+    180deg,
+    rgba(3, 6, 15, 0.88) 0%,
+    rgba(3, 6, 15, 0.55) 50%,
+    rgba(3, 6, 15, 0.85) 100%
+  );
+}
+
+.section-content-veil--bridge {
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 50%,
+    rgba(3, 6, 15, 0.5) 0%,
+    rgba(3, 6, 15, 0.82) 100%
+  );
+}
+
+.section-content-veil--cta {
+  background: linear-gradient(
+    180deg,
+    rgba(3, 6, 15, 0.7) 0%,
+    rgba(3, 6, 15, 0.92) 100%
+  );
+}
+
+/* Background layers */
+.section-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.section-bg-gradient {
+  position: absolute;
+  inset: 0;
+}
+
+.section-bg-img {
+  position: absolute;
+  inset: -5%;
+  width: 110%;
+  height: 110%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.section-bg-grain-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.section-bg--low .section-bg-img { filter: blur(1px) saturate(0.85); }
+
+/* Video layers */
+.video-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.video-layer--ready { opacity: 0.12; }
+.video-layer--low.video-layer--ready { opacity: 0; }
+.video-layer--medium.video-layer--ready { opacity: 0.18; }
+.video-layer--high.video-layer--ready { opacity: 0.45; }
+
+/* F2F scrubber */
+.frame-scrubber {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.frame-scrubber--low { opacity: 0.08; }
+.frame-scrubber--medium { opacity: 0.22; }
+.frame-scrubber--high { opacity: 0.45; }
+
+.s01-f2f, .s02-f2f, .s03-f2f, .s04-f2f, .s19-f2f { z-index: 2; }
+.s01-video-bg, .s19-video-bg { z-index: 1; }
+
+@media (max-width: 900px) {
+  #s01-pin .s01-grid,
+  .s01-grid--owl {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.cursor-glow {
+  position: fixed;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.08), transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.cursor-glow--active { opacity: 1; }

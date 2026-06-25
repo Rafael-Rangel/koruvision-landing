@@ -1,0 +1,38 @@
+{
+  "name": "flowia-landing",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "generate:assets": "python scripts/nv5_pipeline.py --all",
+    "generate:priority": "python scripts/nv5_pipeline.py --priority",
+    "generate:status": "python scripts/nv5_pipeline.py --status",
+    "generate:asset-map": "python scripts/build_asset_map_master.py",
+    "generate:nv11": "python scripts/nv11_pipeline.py",
+    "generate:nv11:priority": "python scripts/nv11_pipeline.py --priority",
+    "generate:nv11:bootstrap": "python scripts/nv11_bootstrap.py",
+    "generate:nv11:f2f": "python scripts/nv11_pipeline.py --f2f-only"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.24",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "^0.185.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.184.1",
+    "eslint": "^9.16.0",
+    "eslint-config-next": "^15.1.0",
+    "typescript": "^5.7.2"
+  }
+}

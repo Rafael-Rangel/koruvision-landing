@@ -1,0 +1,550 @@
+"""Build demo/index.html from s04 body fragment."""
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+s04 = (ROOT / "demo" / "s04.html").read_text(encoding="utf-8")
+
+# Extract s04 pin section
+m = re.search(r'(<div id="s04-pin-wrap">.*?</div>\s*)\n\s*<div class="scroll-hint">', s04, re.S)
+s04_block = m.group(1) if m else ""
+
+# Update s04 headline for v5
+s04_block = s04_block.replace(
+    "Veja ao vivo.<br><em>Sem enrolação.</em>",
+    "Dentro da <em>máquina.</em>"
+).replace(
+    "Do WhatsApp ao pipeline — cinco atos, um único fluxo. Você controla a câmera.",
+    "Do WhatsApp ao pipeline — cinco atos, um único fluxo. Você controla a câmera."
+)
+
+stars = [
+    ("📱", "WhatsApp nativo"), ("🤖", "IA personalizada"), ("📊", "Pipeline visual"),
+    ("⚡", "Automações"), ("📅", "Agenda sync"), ("👥", "Multi-usuário"),
+    ("🏷️", "Tags inteligentes"), ("📈", "Métricas live"), ("🔒", "LGPD ready"),
+    ("🌐", "Webhooks"), ("💬", "Inbox unificado"), ("🎯", "Lead scoring"),
+]
+
+star_html = ""
+for i, (icon, label) in enumerate(stars):
+    angle = (i / 12) * 360
+    rad = angle * 3.14159 / 180
+    x = 50 + 42 * __import__("math").cos(rad - 1.5708)
+    y = 50 + 42 * __import__("math").sin(rad - 1.5708)
+    star_html += f'        <div class="star-node glass-card" style="left:{x:.1f}%;top:{y:.1f}%;transform:translate(-50%,-50%)"><div class="star-icon">{icon}</div>{label}</div>\n'
+
+cases = [
+    ("Saúde", "Clínica Sorriso", "+340%", "leads qualificados", "R$ 2.4M", "pipeline"),
+    ("Imóveis", "Imob Prime", "+180%", "visitas agendadas", "R$ 8.1M", "VGV"),
+    ("Consultoria", "ScaleUp Pro", "+95%", "propostas enviadas", "R$ 1.2M", "fechado"),
+    ("Agências", "Growth Lab", "+420%", "clientes ativos", "R$ 45K", "MRR"),
+    ("E-commerce", "Loja Viva", "+210%", "recuperação carrinho", "R$ 3.8M", "recuperado"),
+]
+
+case_html = ""
+for niche, name, m1v, m1l, m2v, m2l in cases:
+    case_html += f"""      <article class="case-card glass-card">
+        <div class="case-bg"><span>{niche}</span></div>
+        <div class="case-body">
+          <h3>{name}</h3>
+          <div class="case-metrics">
+            <div><strong>{m1v}</strong><span>{m1l}</span></div>
+            <div><strong>{m2v}</strong><span>{m2l}</span></div>
+            <div><strong>14d</strong><span>ROI</span></div>
+          </div>
+          <p style="color:var(--sub);font-size:0.88rem">"FlowIA transformou nossa operação de WhatsApp em máquina de receita."</p>
+        </div>
+      </article>\n"""
+
+agents = [
+    ("V", "Vendedor", "#B24BFF", "Tom persuasivo, foco em fechamento"),
+    ("S", "Suporte", "#2EE8C0", "Empático, resolve dúvidas rápido"),
+    ("A", "Agendador", "#FFC233", "Organizado, confirma horários"),
+    ("Q", "Qualificador", "#14F0A0", "Perguntas inteligentes, score lead"),
+    ("C", "Consultor", "#FF4D6A", "Consultivo, educa o lead"),
+]
+agent_html = ""
+for letter, name, color, desc in agents:
+    agent_html += f"""        <div class="agent-card-lg glass-card">
+          <div class="agent-avatar" style="background:linear-gradient(135deg,{color},#12182A)">{letter}</div>
+          <h3>{name}</h3>
+          <p>{desc}</p>
+        </div>\n"""
+
+faq_items = [
+    ("Quanto tempo leva para configurar?", "Menos de 5 minutos. Conecte WhatsApp, configure agente e importe contatos."),
+    ("Preciso de cartão para o trial?", "Não. 14 dias grátis, sem cartão de crédito."),
+    ("A IA substitui meu time?", "Não — ela qualifica e responde 24/7. Seu time foca em fechar."),
+    ("Funciona com WhatsApp Business API?", "Sim. Suportamos API oficial e conexão via QR."),
+    ("Meus dados estão seguros?", "Criptografia end-to-end, LGPD compliant, isolamento por tenant."),
+    ("Posso personalizar o tom da IA?", "Sim. 5 personalidades prontas ou crie a sua."),
+    ("Integra com meu CRM atual?", "Webhooks, Zapier e API REST. Migração assistida no Pro."),
+    ("Qual plano para agências?", "Plano Agência com white-label, multi-tenant e MRR dashboard."),
+]
+faq_html = ""
+for q, a in faq_items:
+    faq_html += f"""          <div class="faq-item">
+            <button class="faq-q" type="button">{q}<span>+</span></button>
+            <div class="faq-a"><p>{a}</p></div>
+          </div>\n"""
+
+integrations = ["WhatsApp", "Stripe", "Google", "Zapier", "Webhook", "Meta", "Calendly", "HubSpot", "Slack", "Notion", "RD", "API"]
+
+sat_html = ""
+for i, name in enumerate(integrations):
+    sat_html += f'        <div class="s14-sat">{name[:4]}</div>\n'
+
+html = f"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FlowIA — CRM + IA WhatsApp · KORUVISION</title>
+  <meta name="description" content="Suas conversas viram receita previsível. CRM com IA para WhatsApp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/koruvision.css" />
+  <link rel="stylesheet" href="css/s04.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+  <svg id="data-river-global" viewBox="0 0 100 100" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="riverGlobalGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#B24BFF"/>
+        <stop offset="50%" stop-color="#FFC233"/>
+        <stop offset="100%" stop-color="#2EE8C0"/>
+      </linearGradient>
+      <linearGradient id="riverDangerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FF4D6A"/>
+        <stop offset="100%" stop-color="#B24BFF"/>
+      </linearGradient>
+    </defs>
+    <path id="riverGlobalPath" d="M-5,98 C15,85 25,70 35,55 S55,25 65,15 S85,5 105,-2" vector-effect="non-scaling-stroke"/>
+  </svg>
+
+  <nav class="site-nav">
+    <a class="nav-brand" href="#">
+      <div class="nav-logo">KV</div>
+      <span>FlowIA</span>
+    </a>
+    <div class="nav-links">
+      <a href="#s04-pin-wrap">Demo</a>
+      <a href="#s10">Benefícios</a>
+      <a href="#s17">Planos</a>
+      <a href="#s18">FAQ</a>
+      <a class="nav-cta" href="#s19-pin">Começar grátis</a>
+    </div>
+  </nav>
+
+  <!-- S01 HERO -->
+  <div id="s01-pin" class="pin-wrap">
+    <section class="pin-section" id="s01">
+      <div class="section-inner s01-grid">
+        <div class="s01-copy">
+          <div class="eyebrow">KORUVISION · FlowIA</div>
+          <h1 class="section-headline" id="s01-headline">Suas conversas viram receita previsível.</h1>
+          <p class="section-lede">CRM com IA para WhatsApp — qualifique leads, feche deals e veja tudo num painel que pensa com você.</p>
+          <div class="cta-row">
+            <a class="btn-primary" href="#s19-pin">Começar grátis — 14 dias</a>
+            <a class="btn-ghost" href="#s04-pin-wrap">Ver demonstração ↓</a>
+          </div>
+        </div>
+        <div class="s01-stage">
+          <div class="s01-void"></div>
+          <canvas id="s01-particles"></canvas>
+          <div class="s01-device">
+            <div class="s01-device-screen">
+              <div class="s01-mini-bar w80"></div>
+              <div class="s01-mini-bar w60 gold"></div>
+              <div class="s01-mini-bar"></div>
+              <div class="s01-mini-bar w60"></div>
+              <div class="s01-mini-bar gold" style="width:45%"></div>
+            </div>
+          </div>
+          <div class="s01-chip c1">+1 lead qualificado</div>
+          <div class="s01-chip c2">Pipeline R$ 47.800</div>
+        </div>
+      </div>
+      <div class="s01-scroll-hint"><span>Role para explorar</span>↓</div>
+    </section>
+  </div>
+
+  <!-- S02 PROBLEMA -->
+  <div id="s02-pin" class="pin-wrap">
+    <section class="pin-section" id="s02">
+      <div class="section-inner">
+        <div class="eyebrow">O problema</div>
+        <h2 class="section-headline">Sua operação está <em>perdida na névoa.</em></h2>
+        <p class="section-lede">WhatsApp solto, planilhas quebradas, bots sem alma e pipeline vazio — o lead esfria enquanto você apaga incêndio.</p>
+        <div class="s02-grid">
+          <div class="pain-card glass-card"><div class="icon">💬</div><h3>WhatsApp caótico</h3><p>Conversas espalhadas, sem histórico, sem contexto.</p></div>
+          <div class="pain-card glass-card"><div class="icon">📋</div><h3>Planilhas quebradas</h3><p>Dados desatualizados, erros humanos, zero visibilidade.</p></div>
+          <div class="pain-card glass-card"><div class="icon">🤖</div><h3>Bots sem alma</h3><p>Respostas genéricas que afastam leads qualificados.</p></div>
+          <div class="pain-card glass-card"><div class="icon">📉</div><h3>Pipeline vazio</h3><p>Leads esfriam enquanto você apaga incêndio operacional.</p></div>
+        </div>
+        <div class="s02-stat">
+          <div class="s02-stat-val" id="s02-stat-val">0%</div>
+          <div class="s02-stat-lbl">das PMEs perdem leads<br>por falta de follow-up</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- S03 BRIDGE -->
+  <div id="s03-pin" class="pin-wrap">
+    <section class="pin-section" id="s03">
+      <div class="s03-tunnel-wrap">
+        <svg class="s03-tunnel" viewBox="0 0 400 400">
+          <g class="s03-tunnel" transform="translate(200,200)">
+            <circle r="40" class="s03-tunnel"/><circle r="80" class="s03-tunnel"/><circle r="120" class="s03-tunnel"/>
+            <circle r="160" class="s03-tunnel"/><circle r="200" class="s03-tunnel"/>
+          </g>
+        </svg>
+      </div>
+      <div class="section-inner" style="text-align:center">
+        <div class="eyebrow">A travessia</div>
+        <h2 class="section-headline">Atravesse. <em>Do caos ao controle.</em></h2>
+        <p class="section-lede" style="margin:0 auto 32px">Quatro pilares substituem quatro dores — o rio de dados volta a fluir em violeta e ouro.</p>
+        <div class="s03-pillars">
+          <div class="pillar-card glass-card"><div class="check">✓</div><h3>Inbox unificado</h3><p>Todas as conversas num lugar</p></div>
+          <div class="pillar-card glass-card"><div class="check">✓</div><h3>IA com personalidade</h3><p>Tom humano, 24/7</p></div>
+          <div class="pillar-card glass-card"><div class="check">✓</div><h3>Pipeline visual</h3><p>Deals em movimento</p></div>
+          <div class="pillar-card glass-card"><div class="check">✓</div><h3>Automação inteligente</h3><p>Triggers que pensam</p></div>
+        </div>
+        <a class="btn-primary" href="#s04-pin-wrap" style="margin-top:32px">Entrar na máquina →</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- S04 DEMO -->
+{s04_block}
+
+  <!-- S05 PORTALS -->
+  <div id="s05-pin" class="pin-wrap">
+    <section class="pin-section" id="s05">
+      <div class="section-inner">
+        <div class="eyebrow">Setup rápido</div>
+        <h2 class="section-headline">Três portais. <em>Cinco minutos.</em></h2>
+        <p class="section-lede">Conecte o WhatsApp, configure seu agente e importe contatos — o rio de dados começa a fluir sozinho.</p>
+        <div class="s05-portals">
+          <div class="portal-mono glass-card"><div class="portal-num">01</div><h3>Conectar WhatsApp</h3><p>QR code, API oficial ou Business</p><div class="s05-qr">QR Scan</div></div>
+          <div class="portal-mono glass-card"><div class="portal-num">02</div><h3>Configurar Agente</h3><p>Personalidade, tom e regras de qualificação</p></div>
+          <div class="portal-mono glass-card"><div class="portal-num">03</div><h3>Importar Contatos</h3><p>CSV, planilha ou CRM anterior</p></div>
+        </div>
+        <a class="btn-primary" href="#s19-pin" style="margin-top:24px">Conectar meu WhatsApp</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- S06 AGENTES -->
+  <div id="s06-pin" class="pin-wrap">
+    <section class="pin-section" id="s06">
+      <div class="section-inner" style="width:100%;max-width:none;padding-left:0">
+        <div style="padding:0 clamp(20px,4vw,48px);margin-bottom:24px">
+          <div class="eyebrow">Personalidade IA</div>
+          <h2 class="section-headline">IA que fala <em>como sua marca.</em></h2>
+          <div class="s06-toggle-wrap">
+            <span style="font-size:0.85rem;color:var(--sub)">Modo robô</span>
+            <div class="s06-toggle on" role="button" tabindex="0" aria-label="Toggle personalidade"></div>
+            <span style="font-size:0.85rem;color:var(--cyan)">Modo humano</span>
+          </div>
+        </div>
+        <div class="s06-track">
+{agent_html}        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- S07 INBOX -->
+  <div id="s07-pin" class="pin-wrap">
+    <section class="pin-section" id="s07">
+      <div class="section-inner">
+        <div class="eyebrow">Sala de comando</div>
+        <h2 class="section-headline">Sua <em>sala de comando.</em></h2>
+        <p class="section-lede">Inbox unificado, tags inteligentes e handoff suave — nenhuma conversa se perde.</p>
+        <div class="s07-grid">
+          <div class="inbox-mock glass-card">
+            <div class="inbox-col">
+              <div class="inbox-thread active">Maria S. · 2min</div>
+              <div class="inbox-thread">João P. · 15min</div>
+              <div class="inbox-thread">Ana L. · 1h</div>
+            </div>
+            <div class="inbox-col">
+              <div style="padding:12px;font-size:0.85rem;line-height:1.6">
+                <p style="margin-bottom:8px;color:var(--sub)">Maria: Quanto custa a consulta?</p>
+                <p style="background:rgba(178,75,255,0.15);padding:8px;border-radius:8px">IA: Avaliação gratuita! Temos horários amanhã.</p>
+              </div>
+            </div>
+            <div class="inbox-col">
+              <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px">DETALHES</div>
+              <div style="font-size:0.82rem">Score: <strong style="color:var(--cyan)">87%</strong></div>
+              <div style="font-size:0.82rem;margin-top:4px">Tag: <span style="color:var(--gold)">Quente</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="callout glass-card"><strong>Handoff IA→Humano</strong>Transição suave quando o lead precisa de toque humano.</div>
+            <div class="callout glass-card"><strong>Tags automáticas</strong>Classificação inteligente por intenção e score.</div>
+            <div class="callout glass-card"><strong>Zero perda</strong>Toda conversa rastreada no CRM.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- S08 FUNIL -->
+  <div id="s08-pin" class="pin-wrap">
+    <section class="pin-section" id="s08">
+      <div class="section-inner">
+        <div class="eyebrow">Pipeline</div>
+        <h2 class="section-headline">Gravidade <em>do deal.</em></h2>
+        <p class="section-lede">Maria percorre o funil com snap magnético — de lead frio a contrato fechado num gesto.</p>
+        <div class="s08-kanban" id="s08-kanban-wrap" style="position:relative">
+          <div class="s08-col"><h4>Novo</h4><div class="deal-card"><strong>Maria S.</strong><br><span style="color:var(--muted);font-size:0.8rem">Consulta · R$ 2.400</span></div></div>
+          <div class="s08-col"><h4>Qualificado</h4></div>
+          <div class="s08-col"><h4>Proposta</h4></div>
+          <div class="s08-col"><h4>Fechado</h4></div>
+          <div class="deal-card flying" id="s08-fly-card" style="opacity:0"><strong>Maria S.</strong></div>
+        </div>
+        <div class="s08-counter" id="s08-counter">R$ 0</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- S09 AUTOMAÇÕES -->
+  <div id="s09-pin" class="pin-wrap">
+    <section class="pin-section" id="s09">
+      <div class="section-inner">
+        <div class="eyebrow">Automações</div>
+        <h2 class="section-headline">O sistema nervoso <em>do seu CRM.</em></h2>
+        <p class="section-lede">Triggers, condições e ações — energia percorre cada nó enquanto você dorme.</p>
+        <div class="s09-workflow" style="position:relative;min-height:280px">
+          <svg class="s09-path-svg" viewBox="0 0 800 280"><path id="s09-wf-path" d="M80,140 C200,140 200,60 320,60 S440,220 560,220 S680,140 720,140" fill="none" stroke="url(#riverGlobalGrad)" stroke-width="2"/></svg>
+          <div class="wf-node glass-card"><div class="node-icon">⚡</div>Trigger</div>
+          <div class="wf-node glass-card"><div class="node-icon">🔍</div>Condição</div>
+          <div class="wf-node glass-card"><div class="node-icon">💬</div>WhatsApp</div>
+          <div class="wf-node glass-card"><div class="node-icon">📊</div>CRM</div>
+          <div class="wf-node glass-card"><div class="node-icon">📅</div>Agenda</div>
+          <div class="wf-node glass-card"><div class="node-icon">✅</div>Sucesso</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- S10 CONSTELAÇÃO -->
+  <section class="section-flow" id="s10">
+    <div class="section-inner" style="text-align:center">
+      <div class="eyebrow">Benefícios</div>
+      <h2 class="section-headline">Doze estrelas. <em>Um sistema.</em></h2>
+      <p class="section-lede" style="margin:0 auto">Cada benefício é um nó da constelação FlowIA — passe o mouse e descubra.</p>
+      <div class="s10-orbit">
+{star_html}      </div>
+    </div>
+  </section>
+
+  <!-- S11 ANTES/DEPOIS -->
+  <div id="s11-pin" class="pin-wrap">
+    <section class="pin-section" id="s11">
+      <div class="section-inner">
+        <div class="eyebrow">Transformação</div>
+        <h2 class="section-headline">A linha entre o <em>caos e o controle.</em></h2>
+        <div class="s11-slider-wrap">
+          <div class="s11-panel before"><h3>Caos</h3><p style="color:var(--danger)">Planilhas · Bots · Leads perdidos</p></div>
+          <div class="s11-panel after"><h3>Controle</h3><p style="color:var(--cyan)">Pipeline · IA · Receita previsível</p></div>
+          <div class="s11-handle"></div>
+        </div>
+        <table class="s11-table glass-card" style="padding:0;overflow:hidden;display:block">
+          <tr><td>Follow-up manual</td><td>Automação 24/7</td></tr>
+          <tr><td>Zero visibilidade</td><td>Dashboard tempo real</td></tr>
+          <tr><td>Leads esfriando</td><td>Score + qualificação IA</td></tr>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- S12 CASES -->
+  <div id="s12-pin" class="pin-wrap">
+    <section class="pin-section" id="s12">
+      <div class="section-inner" style="width:100%;max-width:none;padding-left:0">
+        <div style="padding:0 clamp(20px,4vw,48px);margin-bottom:24px">
+          <div class="eyebrow">Cases</div>
+          <h2 class="section-headline">Cinco mercados. <em>Um fluxo.</em></h2>
+        </div>
+        <div class="s12-track">
+{case_html}        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- S13 SOCIAL -->
+  <section class="section-flow" id="s13">
+    <div class="section-inner" style="text-align:center">
+      <div class="eyebrow">Prova social</div>
+      <h2 class="section-headline">+2.400 equipes <em>já cruzaram.</em></h2>
+      <div class="s13-counters">
+        <div class="s13-counter"><strong id="s13-c1">0</strong><span>Equipes ativas</span></div>
+        <div class="s13-counter"><strong id="s13-c2">0</strong><span>Satisfação NPS</span></div>
+        <div class="s13-counter"><strong id="s13-c3">0</strong><span>Mensagens/mês</span></div>
+        <div class="s13-counter"><strong id="s13-c4">0</strong><span>Setup médio</span></div>
+      </div>
+      <div class="marquee-wrap">
+        <div class="marquee-track">
+          <span class="marquee-item">★★★★★ "Revolucionou nosso WhatsApp"</span>
+          <span class="marquee-item">Clínica Sorriso</span>
+          <span class="marquee-item">Imob Prime</span>
+          <span class="marquee-item">Growth Lab</span>
+          <span class="marquee-item">ScaleUp Pro</span>
+          <span class="marquee-item">★★★★★ "ROI em 14 dias"</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- S14 INTEGRAÇÕES -->
+  <div id="s14-pin" class="pin-wrap">
+    <section class="pin-section" id="s14">
+      <div class="section-inner" style="text-align:center">
+        <div class="eyebrow">Ecossistema</div>
+        <h2 class="section-headline">Tudo orbita <em>o seu CRM.</em></h2>
+        <div class="s14-orbit-stage">
+          <div class="s14-core">FlowIA</div>
+{sat_html}        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- S15 AGÊNCIA -->
+  <div id="s15-pin" class="pin-wrap">
+    <section class="pin-section" id="s15">
+      <div class="section-inner">
+        <div class="eyebrow">Para agências</div>
+        <h2 class="section-headline">Seu portal. <em>Suas marcas.</em></h2>
+        <div class="s15-portal">
+          <div>
+            <p class="section-lede">Gerencie clientes, personalize white-label e escale MRR.</p>
+            <div class="s15-mrr" id="s15-mrr">R$ 0</div>
+            <p style="color:var(--sub);font-size:0.88rem">MRR médio agências FlowIA</p>
+          </div>
+          <div class="tenant-grid">
+            <div class="tenant-chip glass-card">Cliente A</div>
+            <div class="tenant-chip glass-card">Cliente B</div>
+            <div class="tenant-chip glass-card">Cliente C</div>
+            <div class="tenant-chip glass-card">Cliente D</div>
+            <div class="tenant-chip glass-card">Cliente E</div>
+            <div class="tenant-chip glass-card">Cliente F</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- S16 SEGURANÇA -->
+  <section class="section-flow" id="s16">
+    <div class="section-inner" style="text-align:center">
+      <div class="eyebrow">Segurança</div>
+      <h2 class="section-headline">Fortaleza <em>de dados.</em></h2>
+      <div class="s16-shield-wrap">
+        <svg class="s16-shield" viewBox="0 0 120 140">
+          <path id="s16-shield-path" d="M60,10 L110,35 L110,85 C110,110 60,130 60,130 C60,130 10,110 10,85 L10,35 Z" fill="none" stroke="#2EE8C0" stroke-width="2"/>
+        </svg>
+        <div class="s16-badges">
+          <span class="badge-pill">LGPD Compliant</span>
+          <span class="badge-pill">SSL 256-bit</span>
+          <span class="badge-pill">Backup diário</span>
+          <span class="badge-pill">Tenant isolation</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- S17 PLANOS -->
+  <section class="section-flow" id="s17">
+    <div class="section-inner">
+      <div style="text-align:center">
+        <div class="eyebrow">Planos</div>
+        <h2 class="section-headline">Escolha <em>seu portal.</em></h2>
+        <div class="s17-toggle-wrap">
+          <span>Mensal</span>
+          <div class="s06-toggle" id="s17-toggle" role="button" tabindex="0"></div>
+          <span style="color:var(--gold)">Anual (-20%)</span>
+        </div>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card glass-card">
+          <h3>Starter</h3>
+          <div class="price-val" data-monthly="R$ 97" data-annual="R$ 78">R$ 97<small>/mês</small></div>
+          <ul class="price-features"><li>1 WhatsApp</li><li>500 contatos</li><li>IA básica</li><li>Pipeline</li></ul>
+          <a class="btn-ghost" href="#s19-pin" style="width:100%;justify-content:center;display:flex">Começar grátis</a>
+        </div>
+        <div class="price-card glass-card popular">
+          <span class="tag-pop">Popular</span>
+          <h3>Pro</h3>
+          <div class="price-val" data-monthly="R$ 297" data-annual="R$ 238">R$ 297<small>/mês</small></div>
+          <ul class="price-features"><li>3 WhatsApp</li><li>5.000 contatos</li><li>IA avançada</li><li>Automações</li><li>Integrações</li></ul>
+          <a class="btn-primary" href="#s19-pin" style="width:100%;justify-content:center">Assinar Pro</a>
+        </div>
+        <div class="price-card glass-card">
+          <h3>Agência</h3>
+          <div class="price-val" data-monthly="R$ 697" data-annual="R$ 558">R$ 697<small>/mês</small></div>
+          <ul class="price-features"><li>White-label</li><li>Multi-tenant</li><li>MRR dashboard</li><li>Suporte VIP</li></ul>
+          <a class="btn-ghost" href="#s15-pin" style="width:100%;justify-content:center;display:flex">Falar com vendas</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- S18 FAQ -->
+  <section class="section-flow" id="s18">
+    <div class="section-inner">
+      <div class="s18-grid">
+        <div>
+          <div class="eyebrow">FAQ</div>
+          <h2 class="section-headline">Perguntas que a <em>névoa esconde.</em></h2>
+          <input class="faq-search" id="faq-search" type="search" placeholder="Buscar pergunta..." />
+          <div class="faq-list">
+{faq_html}          </div>
+        </div>
+        <div class="glass-card" style="padding:32px;min-height:320px;background:radial-gradient(ellipse at 50% 50%,rgba(178,75,255,0.08),transparent)">
+          <p style="color:var(--sub);font-size:0.95rem;line-height:1.7">Respostas diretas sobre setup, IA, preços e segurança — sem juridiquês. Nossa equipe responde em menos de 2 horas.</p>
+          <a class="btn-primary" href="#" style="margin-top:24px">Falar com suporte</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- S19 CTA -->
+  <div id="s19-pin" class="pin-wrap">
+    <section class="pin-section" id="s19">
+      <svg class="s19-shockwave" viewBox="0 0 100 100"><circle cx="50" cy="50" r="30" fill="none" stroke="#FFC233" stroke-width="0.5"/></svg>
+      <div class="section-inner s19-center">
+        <div class="eyebrow">Convergência</div>
+        <h2 class="section-headline" id="s19-headline">A névoa se abre. Sua receita entra.</h2>
+        <p class="section-lede">Junte-se a milhares que transformaram conversas em pipeline previsível — comece em 5 minutos.</p>
+        <div class="cta-row" style="justify-content:center">
+          <a class="btn-primary" href="#">Começar grátis agora</a>
+          <a class="btn-ghost" href="#">Agendar demonstração</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-col"><h4>FlowIA</h4><a href="#">Sobre</a><a href="#">Blog</a><a href="#">Carreiras</a></div>
+    <div class="footer-col"><h4>Produto</h4><a href="#s04-pin-wrap">Demo</a><a href="#s17">Planos</a><a href="#s14-pin">Integrações</a></div>
+    <div class="footer-col"><h4>Legal</h4><a href="#">Privacidade</a><a href="#">Termos</a><a href="#s16">Segurança</a></div>
+    <div class="footer-copy">© 2026 KORUVISION · FlowIA. Todos os direitos reservados.</div>
+  </footer>
+
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <script src="js/motion-core.js"></script>
+  <script src="js/s04.js"></script>
+  <script src="js/landing.js"></script>
+</body>
+</html>
+"""
+
+(ROOT / "demo" / "index.html").write_text(html, encoding="utf-8")
+print("index.html written", len(html))

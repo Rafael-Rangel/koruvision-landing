@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>S04 — Demo Visual · KORUVISION FlowIA</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --void: #000000;
+      --surface: #0A0A0F;
+      --surface-2: #12121A;
+      --border: #1E2940;
+      --muted: #4B5E80;
+      --text: #F0F4FF;
+      --sub: #8B9EC4;
+      --purple: #9D4EDD;
+      --purple-deep: #7B2CBF;
+      --gold: #FFB700;
+      --success: #10B981;
+      --wa: #25D366;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    html { scroll-behavior: auto; }
+    body {
+      background: var(--void);
+      color: var(--text);
+      font-family: Inter, system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* —— Intro / outro spacers —— */
+    .scroll-hint {
+      min-height: 50vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .scroll-hint svg { opacity: 0.5; animation: bob 2s ease-in-out infinite; }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
+    /* —— S04 pinned section —— */
+    #s04 {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .s04-inner {
+      display: grid;
+      grid-template-columns: minmax(280px, 38%) 1fr;
+      height: 100vh;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 clamp(20px, 4vw, 48px);
+      gap: clamp(24px, 4vw, 56px);
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* —— Left narrative panel —— */
+    .narrative { position: relative; }
+    .eyebrow {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 14px;
+    }
+    .headline {
+      font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .headline em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--gold), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .lede {
+      color: var(--sub);
+      font-size: 1.05rem;
+      line-height: 1.55;
+      margin-bottom: 28px;
+      max-width: 420px;
+    }
+    .act-nav {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .act-pip {
+      flex: 1;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--surface-2);
+      position: relative;
+      overflow: hidden;
+    }
+    .act-pip::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, var(--gold), var(--purple));
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    .act-pip.done::after { transform: scaleX(1); }
+    .act-pip.active::after { transform: scaleX(var(--fill, 0)); }
+    .act-counter {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+      font-variant-numeric: tabular-nums;
+    }
+    .act-counter strong { color: var(--gold); }
+    .act-copy-wrap {
+      min-height: 5.6em;
+      position: relative;
+    }
+    .act-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 8px;
+      min-height: 1.4em;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .act-desc {
+      color: var(--sub);
+      font-size: 0.95rem;
+      line-height: 1.55;
+      min-height: 3.2em;
+      max-width: 400px;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .act-copy-wrap.is-fading .act-title,
+    .act-copy-wrap.is-fading .act-desc {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 28px;
+      padding: 14px 26px;
+      background: linear-gradient(135deg, var(--gold), #e6a500);
+      color: #000;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-radius: 10px;
+      text-decoration: none;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: box-shadow 0.3s;
+    }
+    .cta-btn.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .cta-btn:hover { box-shadow: 0 8px 32px rgba(255,183,0,0.35); }
+
+    /* —— Stage / camera rig —— */
+    .stage-zone {
+      position: relative;
+      height: min(72vh, 640px);
+      perspective: 2000px;
+      perspective-origin: 50% 42%;
+    }
+    .camera-rig {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+    .layer {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      border-radius: 20px;
+      pointer-events: none;
+    }
+    .layer-void {
+      background: var(--void) center/cover no-repeat;
+      transform: translateZ(-520px) scale(1.55);
+      border-radius: 24px;
+      filter: brightness(0.8) saturate(1.1);
+    }
+    .layer-grid {
+      transform: translateZ(-420px) rotateX(68deg) scale(2.2);
+      transform-origin: 50% 80%;
+      opacity: 0.22;
+      background:
+        linear-gradient(rgba(157,78,221,0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(157,78,221,0.15) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, #000 20%, transparent 75%);
+    }
+    .layer-fog-far {
+      background: radial-gradient(ellipse 90% 70% at 50% 60%, rgba(123,44,191,0.18), transparent 65%);
+      transform: translateZ(-300px) scale(1.25);
+      filter: blur(2px);
+    }
+    .layer-fog-near {
+      background: radial-gradient(ellipse 60% 50% at 45% 45%, rgba(157,78,221,0.1), transparent 60%);
+      transform: translateZ(-140px);
+      filter: blur(8px);
+    }
+    .layer-glow {
+      background: radial-gradient(ellipse 70% 60% at 50% 45%, rgba(157,78,221,0.28), transparent 70%);
+      transform: translateZ(-100px);
+    }
+    .layer-glow-gold {
+      background: radial-gradient(ellipse 40% 30% at 60% 55%, rgba(255,183,0,0.12), transparent 60%);
+      transform: translateZ(-60px);
+    }
+    .layer-river {
+      transform: translateZ(-30px);
+      opacity: 0.55;
+    }
+    .layer-river svg { width: 100%; height: 100%; }
+    .depth-vignette {
+      transform: translateZ(220px);
+      background: radial-gradient(ellipse 85% 75% at 50% 50%, transparent 40%, rgba(0,0,0,0.55) 100%);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Ambient orbs — depth field */
+    .float-orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(1px);
+      will-change: transform;
+    }
+    .orb-1 {
+      width: 120px; height: 120px;
+      top: 10%; left: 8%;
+      background: radial-gradient(circle, rgba(157,78,221,0.35), transparent 70%);
+    }
+    .orb-2 {
+      width: 80px; height: 80px;
+      top: 55%; right: 5%;
+      background: radial-gradient(circle, rgba(255,183,0,0.25), transparent 70%);
+    }
+    .orb-3 {
+      width: 60px; height: 60px;
+      bottom: 15%; left: 20%;
+      background: radial-gradient(circle, rgba(16,185,129,0.2), transparent 70%);
+    }
+    .orb-4 {
+      width: 40px; height: 40px;
+      top: 25%; right: 22%;
+      background: radial-gradient(circle, rgba(224,224,224,0.15), transparent 70%);
+    }
+
+    /* Device stack — hero mockup */
+    .device-stack {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: min(92vw, 520px);
+      aspect-ratio: 9/16;
+      max-height: min(68vh, 600px);
+      transform-style: preserve-3d;
+      transform: translate(-50%, -50%) translateZ(90px);
+    }
+    .device-shadow {
+      position: absolute;
+      left: 50%;
+      top: 55%;
+      width: 75%;
+      height: 40px;
+      transform: translate(-50%, 0) translateZ(-45px) rotateX(78deg);
+      background: radial-gradient(ellipse, rgba(157,78,221,0.35), transparent 70%);
+      filter: blur(18px);
+      pointer-events: none;
+    }
+    .device-reflection {
+      position: absolute;
+      left: 50%;
+      bottom: -8%;
+      width: 70%;
+      height: 28%;
+      transform: translate(-50%, 0) translateZ(-30px) rotateX(180deg) scaleY(-0.35);
+      background: linear-gradient(180deg, rgba(157,78,221,0.08), transparent);
+      border-radius: 28px;
+      opacity: 0.5;
+      mask-image: linear-gradient(180deg, #000, transparent);
+      pointer-events: none;
+    }
+    .device-rim {
+      position: absolute;
+      inset: -1px;
+      border-radius: 29px;
+      background: linear-gradient(145deg, rgba(224,224,224,0.2), transparent 40%, rgba(157,78,221,0.15));
+      pointer-events: none;
+      z-index: 25;
+      mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      padding: 1px;
+    }
+
+    /* —— Device chrome —— */
+    .device-shell {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      will-change: transform;
+      border-radius: 28px;
+      border: 1px solid rgba(224,224,224,0.14);
+      box-shadow:
+        0 0 0 1px rgba(157,78,221,0.2),
+        0 50px 120px rgba(0,0,0,0.75),
+        0 0 100px rgba(157,78,221,0.18),
+        0 20px 40px rgba(157,78,221,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        inset 0 -20px 40px rgba(0,0,0,0.4);
+      background: linear-gradient(165deg, #22222c 0%, #0e0e14 35%, #050508 100%);
+      overflow: visible;
+    }
+    .device-notch {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 24px;
+      background: #000;
+      border-radius: 14px;
+      z-index: 20;
+    }
+    .device-screen {
+      position: absolute;
+      inset: 8px;
+      border-radius: 22px;
+      overflow: hidden;
+      background: var(--surface);
+      transform-style: preserve-3d;
+      transform: translateZ(12px);
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+    }
+
+    /* UI depth layers inside mockup */
+    .ui-screen { transform-style: preserve-3d; }
+    .ui-status { transform: translateZ(28px); }
+    .ui-header { transform: translateZ(42px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+    .ui-body { transform: translateZ(18px); }
+    .chat-msgs { transform-style: preserve-3d; transform: translateZ(20px); }
+    .badge-new { transform: translateZ(50px); }
+    .agent-card { transform: translateZ(38px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+    .metric { transform: translateZ(24px); }
+    .dash-chart { transform: translateZ(30px); }
+
+    /* —— UI screens —— */
+    .ui-screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: visible;
+      pointer-events: none;
+      background: var(--surface);
+      will-change: opacity, transform;
+      backface-visibility: hidden;
+    }
+    .ui-screen.visible { pointer-events: auto; }
+
+    .ui-status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 32px 16px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .ui-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,15,0.9);
+    }
+    .ui-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--purple-deep));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .ui-header-text h3 { font-size: 14px; font-weight: 600; }
+    .ui-header-text span { font-size: 11px; color: var(--success); }
+    .ui-body { flex: 1; overflow: hidden; position: relative; }
+
+    /* WhatsApp */
+    .chat-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 80%, rgba(37,211,102,0.04), transparent 40%),
+        repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(255,255,255,0.01) 24px, rgba(255,255,255,0.01) 25px);
+    }
+    .chat-msgs {
+      position: absolute;
+      inset: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .bubble {
+      max-width: 82%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.45;
+      transform: translateY(24px) scale(0.92);
+      opacity: 0;
+      transform-origin: center bottom;
+    }
+    .bubble.in {
+      align-self: flex-start;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+    .bubble.out {
+      align-self: flex-end;
+      background: rgba(123,44,191,0.35);
+      border: 1px solid rgba(157,78,221,0.35);
+      border-bottom-right-radius: 4px;
+    }
+    .bubble .time { font-size: 10px; color: var(--muted); margin-top: 4px; text-align: right; }
+    .badge-new {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 10px;
+      transform: scale(0);
+    }
+
+    /* Agent IA */
+    .agent-panel {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 100%;
+    }
+    .agent-card {
+      background: linear-gradient(135deg, rgba(157,78,221,0.15), rgba(123,44,191,0.08));
+      border: 1px solid rgba(157,78,221,0.3);
+      border-radius: 12px;
+      padding: 14px;
+      transform: translateX(-30px);
+      opacity: 0;
+    }
+    .agent-card h4 { font-size: 12px; color: var(--purple); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .agent-card p { font-size: 13px; line-height: 1.45; color: var(--sub); }
+    .typing {
+      display: flex;
+      gap: 4px;
+      padding: 10px 14px;
+      align-self: flex-start;
+      background: var(--surface-2);
+      border-radius: 14px;
+      opacity: 0;
+    }
+    .typing span {
+      width: 6px; height: 6px;
+      background: var(--purple);
+      border-radius: 50%;
+      animation: pulse-dot 1.2s ease infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes pulse-dot { 0%,100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }
+    .intent-tag {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 10px;
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.35);
+      color: var(--success);
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 6px;
+      transform: scale(0);
+    }
+
+    /* Kanban */
+    .kanban {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 10px;
+      height: 100%;
+      font-size: 10px;
+    }
+    .k-col {
+      background: rgba(10,10,15,0.8);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 8px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .k-col h5 {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 9px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .k-card {
+      background: var(--surface-2);
+      border-radius: 6px;
+      padding: 8px;
+      border-left: 3px solid var(--purple);
+      transform: translateY(40px) scale(0.8);
+      opacity: 0;
+    }
+    .k-card strong { display: block; font-size: 11px; margin-bottom: 2px; }
+    .k-card span { color: var(--muted); font-size: 9px; }
+    .k-card.fly {
+      position: absolute;
+      width: calc(25% - 12px);
+      z-index: 5;
+      box-shadow: 0 8px 24px rgba(157,78,221,0.3);
+      transform-origin: center center;
+      pointer-events: none;
+    }
+    .kanban-path-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+    #kanbanMotionPath {
+      fill: none;
+      stroke: url(#kanbanPathGrad);
+      stroke-width: 2;
+      stroke-linecap: round;
+      opacity: 0;
+    }
+    .k-col { transition: box-shadow 0.35s ease, border-color 0.35s ease; }
+    .k-col.explore-hover {
+      border-color: rgba(157,78,221,0.55);
+      box-shadow: 0 0 20px rgba(157,78,221,0.2);
+    }
+
+    /* PEAK Explore Mode */
+    .peak-hint {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 30;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(10,10,15,0.85);
+      border: 1px solid rgba(255,183,0,0.35);
+      padding: 6px 12px;
+      border-radius: 20px;
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+      backdrop-filter: blur(6px);
+    }
+    .stage-zone.peak-explore .peak-hint { opacity: 1; transform: translateY(0); }
+    .bubble.explore-hover {
+      box-shadow: 0 4px 24px rgba(157,78,221,0.35) !important;
+      border-color: rgba(157,78,221,0.5) !important;
+    }
+    .bar {
+      transition: filter 0.3s ease;
+      cursor: default;
+      transform-origin: bottom center;
+    }
+    .stage-zone.peak-explore .bar { cursor: pointer; }
+    .bar.explore-hover {
+      filter: brightness(1.35);
+      box-shadow: 0 0 12px rgba(157,78,221,0.45);
+    }
+    .metric.explore-hover {
+      border-color: rgba(255,183,0,0.45) !important;
+      box-shadow: 0 0 20px rgba(255,183,0,0.12);
+    }
+    .agent-card.explore-hover {
+      border-color: rgba(157,78,221,0.6) !important;
+      box-shadow: 0 8px 32px rgba(157,78,221,0.25);
+    }
+    .cta-btn.magnetic-ready {
+      transition: box-shadow 0.3s ease;
+    }
+    .cta-btn.magnetic-ready:hover {
+      box-shadow: 0 12px 40px rgba(255,183,0,0.4);
+    }
+    .cursor-glow {
+      position: fixed;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(157,78,221,0.12), transparent 70%);
+      pointer-events: none;
+      z-index: 50;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: screen;
+      transition: opacity 0.4s ease;
+    }
+    body.peak-explore .cursor-glow { opacity: 1; }
+
+    /* Calendar */
+    .cal-wrap { padding: 12px; height: 100%; display: flex; flex-direction: column; gap: 10px; }
+    .cal-header { font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(-10px); }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      flex: 1;
+    }
+    .cal-cell {
+      background: var(--surface-2);
+      border-radius: 4px;
+      min-height: 28px;
+      font-size: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+    }
+    .cal-event {
+      grid-column: span 7;
+      background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));
+      border: 1px solid rgba(16,185,129,0.4);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 8px;
+      transform: scale(0.85);
+      opacity: 0;
+    }
+    .cal-event h4 { color: var(--success); font-size: 13px; margin-bottom: 4px; }
+    .cal-event p { font-size: 11px; color: var(--sub); }
+
+    /* Dashboard */
+    .dash { padding: 12px; display: flex; flex-direction: column; gap: 10px; height: 100%; }
+    .dash-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .metric {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    .metric .val {
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--gold), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .metric .lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .dash-chart {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      opacity: 0;
+    }
+    .bar {
+      flex: 1;
+      background: linear-gradient(180deg, var(--purple), var(--purple-deep));
+      border-radius: 4px 4px 0 0;
+      transform: scaleY(0);
+      transform-origin: bottom;
+    }
+
+    /* Floating panels — spatial depth */
+    .float-panel {
+      position: absolute;
+      padding: 10px 14px;
+      background: rgba(12,12,18,0.88);
+      border: 1px solid rgba(157,78,221,0.35);
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      backdrop-filter: blur(12px);
+      box-shadow:
+        0 16px 40px rgba(0,0,0,0.45),
+        0 0 24px rgba(157,78,221,0.12);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform-style: preserve-3d;
+      will-change: transform, opacity;
+    }
+    .float-panel .fp-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .float-panel .fp-val { font-size: 13px; color: var(--gold); }
+    .float-panel .fp-val.green { color: var(--success); }
+    .fp-notif { top: -6%; right: -14%; transform: translateZ(160px); border-left: 3px solid var(--wa); }
+    .fp-metric { top: 18%; left: -18%; transform: translateZ(140px); }
+    .fp-pipeline { bottom: 8%; right: -16%; transform: translateZ(130px); }
+    .fp-ia { bottom: 22%; left: -14%; transform: translateZ(175px); border-color: rgba(255,183,0,0.4); }
+
+    /* Legacy chips — upgraded depth */
+    .float-chip {
+      position: absolute;
+      padding: 8px 12px;
+      background: rgba(18,18,26,0.92);
+      border: 1px solid rgba(157,78,221,0.35);
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gold);
+      backdrop-filter: blur(8px);
+      transform: translateZ(120px);
+      opacity: 0;
+      white-space: nowrap;
+      transform-origin: center center;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    }
+    .chip-1 { top: 6%; right: -10%; }
+    .chip-2 { bottom: 10%; left: -10%; }
+
+    /* Progress ring */
+    .progress-ring {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      z-index: 100;
+      opacity: 0.7;
+    }
+    .progress-ring circle { fill: none; stroke-width: 3; }
+    .progress-ring .bg { stroke: var(--surface-2); }
+    .progress-ring .fg { stroke: url(#ringGrad); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; }
+
+    @media (max-width: 900px) {
+      .s04-inner { grid-template-columns: 1fr; grid-template-rows: auto 1fr; padding-top: 20px; }
+      .stage-zone { height: 55vh; perspective: 1200px; order: -1; }
+      .headline { font-size: 1.5rem; }
+      .float-chip, .float-panel, .float-orb, .layer-grid { display: none; }
+      .device-stack { transform: translate(-50%, -50%) translateZ(40px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-hint svg { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scroll-hint">
+    <span>Role para entrar na demonstração</span>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+
+  <div id="s04-pin-wrap">
+    <section id="s04">
+      <div class="s04-inner">
+        <aside class="narrative">
+          <div class="eyebrow">Demonstração ao vivo</div>
+          <h1 class="headline">Veja ao vivo.<br><em>Sem enrolação.</em></h1>
+          <p class="lede">Do WhatsApp ao pipeline — cinco atos, um único fluxo. Você controla a câmera.</p>
+          <div class="act-nav" id="actNav"></div>
+          <div class="act-counter">Ato <strong id="actNum">1</strong> de 5</div>
+          <div class="act-copy-wrap" id="actCopyWrap">
+            <div class="act-title" id="actTitle"></div>
+            <div class="act-desc" id="actDesc"></div>
+          </div>
+          <a class="cta-btn" id="ctaBtn" href="#">Experimentar gratuitamente →</a>
+        </aside>
+
+        <div class="stage-zone" id="stageZone">
+          <div class="peak-hint" id="peakHint">Passe o mouse · explore</div>
+          <div class="camera-rig" id="camera">
+            <div class="layer layer-void" id="layerVoid"></div>
+            <div class="layer layer-grid" id="layerGrid"></div>
+            <div class="layer layer-fog-far" id="layerFogFar"></div>
+            <div class="layer layer-fog-near" id="layerFogNear"></div>
+            <div class="layer layer-glow" id="layerGlow"></div>
+            <div class="layer layer-glow-gold" id="layerGlowGold"></div>
+            <div class="layer layer-river">
+              <svg viewBox="0 0 400 600" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="riverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#9D4EDD" stop-opacity="0.8"/>
+                    <stop offset="50%" stop-color="#FFB700" stop-opacity="0.6"/>
+                    <stop offset="100%" stop-color="#10B981" stop-opacity="0.5"/>
+                  </linearGradient>
+                </defs>
+                <path id="riverPath" d="M-20,580 C80,520 120,400 200,350 S320,200 420,80" fill="none" stroke="url(#riverGrad)" stroke-width="2.5" stroke-dasharray="800" stroke-dashoffset="800"/>
+              </svg>
+            </div>
+
+            <div class="float-orb orb-1" data-depth="-180" id="orb1"></div>
+            <div class="float-orb orb-2" data-depth="-120" id="orb2"></div>
+            <div class="float-orb orb-3" data-depth="-90" id="orb3"></div>
+            <div class="float-orb orb-4" data-depth="-60" id="orb4"></div>
+
+            <div class="device-stack" id="deviceStack">
+              <div class="device-shadow"></div>
+              <div class="device-reflection"></div>
+              <div class="device-shell" id="device">
+                <div class="device-rim"></div>
+                <div class="device-notch"></div>
+                <div class="device-screen">
+                <!-- ATO 1: WhatsApp -->
+                <div class="ui-screen" data-act="0">
+                  <div class="ui-status"><span>9:41</span><span>FlowIA</span></div>
+                  <div class="ui-header">
+                    <div class="ui-avatar">C</div>
+                    <div class="ui-header-text"><h3>Clínica Sorriso</h3><span>online</span></div>
+                  </div>
+                  <div class="ui-body">
+                    <div class="chat-bg"></div>
+                    <div class="badge-new" id="badgeNew">+1 novo</div>
+                    <div class="chat-msgs">
+                      <div class="bubble in" data-i="0">Oi! Quanto custa a consulta de avaliação?<div class="time">14:32</div></div>
+                      <div class="bubble out" data-i="1">Olá! Que bom ter você aqui 😊 A avaliação é gratuita.<div class="time">14:32</div></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ATO 2: Agente IA -->
+                <div class="ui-screen" data-act="1">
+                  <div class="ui-status"><span>Agente IA</span><span>ativo</span></div>
+                  <div class="ui-header">
+                    <div class="ui-avatar" style="background:linear-gradient(135deg,#9D4EDD,#FFB700)">IA</div>
+                    <div class="ui-header-text"><h3>Assistente FlowIA</h3><span>respondendo...</span></div>
+                  </div>
+                  <div class="ui-body">
+                    <div class="agent-panel">
+                      <div class="agent-card" id="agentCard">
+                        <h4>Análise de intenção</h4>
+                        <p>Lead demonstra interesse em agendamento. Score de qualificação: 87%.</p>
+                        <span class="intent-tag" id="intentTag">🎯 Intenção: Agendar</span>
+                      </div>
+                      <div class="typing" id="typing"><span></span><span></span><span></span></div>
+                      <div class="bubble out" data-i="0" style="opacity:0;transform:none;align-self:flex-start;max-width:90%">Perfeito! Temos horários amanhã às 10h ou 14h. Qual prefere?</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ATO 3: Kanban -->
+                <div class="ui-screen" data-act="2">
+                  <div class="ui-status"><span>CRM</span><span>Pipeline</span></div>
+                  <div class="ui-body">
+                    <svg class="kanban-path-layer" id="kanbanPathSvg">
+                      <defs>
+                        <linearGradient id="kanbanPathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stop-color="#9D4EDD"/>
+                          <stop offset="100%" stop-color="#10B981"/>
+                        </linearGradient>
+                      </defs>
+                      <path id="kanbanMotionPath" d="M0,0"/>
+                    </svg>
+                    <div class="kanban" id="kanban">
+                      <div class="k-col"><h5>Novo</h5></div>
+                      <div class="k-col" id="colQual"><h5>Qualificado</h5></div>
+                      <div class="k-col" id="colProp"><h5>Proposta</h5></div>
+                      <div class="k-col" id="colFech"><h5>Fechado</h5></div>
+                    </div>
+                    <div class="k-card fly" id="flyCard"><strong>Maria S.</strong><span>R$ 2.400 · Consulta</span></div>
+                  </div>
+                </div>
+
+                <!-- ATO 4: Agenda -->
+                <div class="ui-screen" data-act="3">
+                  <div class="ui-status"><span>Agenda</span><span>Google Calendar</span></div>
+                  <div class="ui-body">
+                    <div class="cal-wrap">
+                      <div class="cal-header" id="calHeader">Junho 2026</div>
+                      <div class="cal-grid" id="calGrid"></div>
+                      <div class="cal-event" id="calEvent">
+                        <h4>✓ Consulta confirmada — 14h</h4>
+                        <p>Maria S. · Lembrete automático enviado</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ATO 5: Dashboard -->
+                <div class="ui-screen" data-act="4">
+                  <div class="ui-status"><span>Dashboard</span><span>tempo real</span></div>
+                  <div class="ui-body">
+                    <div class="dash">
+                      <div class="dash-metrics">
+                        <div class="metric" data-m="0"><div class="val" data-count="47800">R$ 0</div><div class="lbl">Pipeline ativo</div></div>
+                        <div class="metric" data-m="1"><div class="val" data-count="23">0%</div><div class="lbl">Conversão</div></div>
+                      </div>
+                      <div class="dash-chart" id="dashChart">
+                        <div class="bar" style="height:45%"></div>
+                        <div class="bar" style="height:62%"></div>
+                        <div class="bar" style="height:38%"></div>
+                        <div class="bar" style="height:78%"></div>
+                        <div class="bar" style="height:55%"></div>
+                        <div class="bar" style="height:92%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+              <div class="float-panel fp-notif" id="fpNotif" data-z="160">
+                <div class="fp-label">WhatsApp</div>
+                <div class="fp-val green">+1 nova mensagem</div>
+              </div>
+              <div class="float-panel fp-metric" id="fpMetric" data-z="140">
+                <div class="fp-label">Conversão</div>
+                <div class="fp-val">+23%</div>
+              </div>
+              <div class="float-panel fp-pipeline" id="fpPipeline" data-z="130">
+                <div class="fp-label">Pipeline</div>
+                <div class="fp-val">R$ 47.800</div>
+              </div>
+              <div class="float-panel fp-ia" id="fpIa" data-z="175">
+                <div class="fp-label">IA FlowIA</div>
+                <div class="fp-val">Score 87%</div>
+              </div>
+            </div>
+
+            <div class="float-chip chip-1" id="chip1">IA detectou intenção</div>
+            <div class="float-chip chip-2" id="chip2">Lead qualificado</div>
+
+            <div class="layer depth-vignette"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Próxima seção: Como Funciona</span>
+  </div>
+
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <svg class="progress-ring" viewBox="0 0 48 48">
+    <defs>
+      <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#FFB700"/>
+        <stop offset="100%" stop-color="#9D4EDD"/>
+      </linearGradient>
+    </defs>
+    <circle class="bg" cx="24" cy="24" r="20"/>
+    <circle class="fg" id="ringFg" cx="24" cy="24" r="20" stroke-dasharray="125.6" stroke-dashoffset="125.6"/>
+  </svg>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.ticker.lagSmoothing(500, 33);
+
+  const ACTS = [
+    { title: "Lead chega no WhatsApp", desc: "Nova mensagem. A IA detecta intenção de compra em segundos — antes de você abrir o app." },
+    { title: "IA responde com personalidade", desc: "Tom humano, delay natural. Qualificação automática enquanto o lead ainda digita." },
+    { title: "Funil CRM em movimento", desc: "Maria entra qualificada no Kanban. O card viaja pelo pipeline com um gesto seu." },
+    { title: "Agendamento automático", desc: "Evento criado no calendário. Lembrete enviado — zero intervenção manual." },
+    { title: "Visão completa do negócio", desc: "Pipeline, conversões e métricas em tempo real. Tudo num único painel." }
+  ];
+
+  const CAM_CONFIGS = [
+    { z: -40, rx: 10, ry: -14, sc: 0.92 },
+    { z: 50, rx: 4, ry: -6, sc: 1.04 },
+    { z: 80, rx: -6, ry: 10, sc: 1.08 },
+    { z: 35, rx: 8, ry: -8, sc: 1.02 },
+    { z: -30, rx: -3, ry: 2, sc: 0.90 }
+  ];
+
+  const isMobile = window.matchMedia("(max-width: 900px)").matches;
+  const pinAmount = isMobile ? "+=380%" : "+=620%";
+  const voidBg = "../assets/images/s04-stage-void.webp";
+
+  /* Motion System — docs/KORUVISION-Motion-System.md */
+  const BUILD_END = 0.48;
+  const PEAK_END  = 0.72;
+
+  const smoothstep = (t) => {
+    t = Math.max(0, Math.min(1, t));
+    return t * t * (3 - 2 * t);
+  };
+  const smoothrange = (t, a, b) => smoothstep((t - a) / (b - a));
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  function phase(local) {
+    if (local < BUILD_END) return { name: "build", t: local / BUILD_END };
+    if (local < PEAK_END)  return { name: "peak",  t: (local - BUILD_END) / (PEAK_END - BUILD_END) };
+    return { name: "exit", t: (local - PEAK_END) / (1 - PEAK_END) };
+  }
+
+  /** Entrada → permanência no peak → saída com transform (não fade seco) */
+  function elementState(local, enterLo, enterHi, exitLo, exitHi, opts = {}) {
+    const { yIn = 24, yOut = -14, scaleIn = 0.92, xOut = 0, rotOut = 0 } = opts;
+    const ph = phase(local);
+
+    if (ph.name === "build") {
+      const e = smoothrange(ph.t, enterLo / BUILD_END, enterHi / BUILD_END);
+      return { opacity: e, y: yIn * (1 - e), x: 0, scale: scaleIn + (1 - scaleIn) * e, rot: 0 };
+    }
+    if (ph.name === "peak") {
+      return { opacity: 1, y: 0, x: 0, scale: 1, rot: 0 };
+    }
+    const x = smoothrange(ph.t, (exitLo - PEAK_END) / (1 - PEAK_END), (exitHi - PEAK_END) / (1 - PEAK_END));
+    return {
+      opacity: 1 - x * 0.25,
+      y: yOut * x,
+      x: xOut * x,
+      scale: 1 - x * 0.1,
+      rot: rotOut * x
+    };
+  }
+
+  function applyState(el, st) {
+    gsap.set(el, {
+      opacity: st.opacity,
+      y: st.y,
+      x: st.x,
+      scale: st.scale,
+      rotation: st.rot
+    });
+  }
+
+  const actNav = document.getElementById("actNav");
+  ACTS.forEach(() => {
+    const p = document.createElement("div");
+    p.className = "act-pip";
+    actNav.appendChild(p);
+  });
+
+  const calGrid = document.getElementById("calGrid");
+  for (let i = 1; i <= 28; i++) {
+    const c = document.createElement("div");
+    c.className = "cal-cell";
+    c.textContent = i;
+    calGrid.appendChild(c);
+  }
+
+  const layerVoid = document.getElementById("layerVoid");
+  const img = new Image();
+  img.onload = () => { layerVoid.style.backgroundImage = `url(${voidBg})`; };
+  img.onerror = () => { layerVoid.style.backgroundImage = "url(../assets/images/demo-plate-ambient.webp)"; };
+  img.src = voidBg;
+
+  const screens = [...document.querySelectorAll(".ui-screen")];
+  const pips = [...document.querySelectorAll(".act-pip")];
+  const actTitle = document.getElementById("actTitle");
+  const actDesc = document.getElementById("actDesc");
+  const actCopyWrap = document.getElementById("actCopyWrap");
+  const actNum = document.getElementById("actNum");
+  const ctaBtn = document.getElementById("ctaBtn");
+  const ringFg = document.getElementById("ringFg");
+  const riverPath = document.getElementById("riverPath");
+  const riverLen = riverPath.getTotalLength();
+  riverPath.style.strokeDasharray = riverLen;
+  riverPath.style.strokeDashoffset = riverLen;
+
+  const camera = document.getElementById("camera");
+  const deviceStack = document.getElementById("deviceStack");
+  const setCamera = gsap.quickSetter(camera, "transform");
+  const setDeviceStack = gsap.quickSetter(deviceStack, "transform");
+
+  const FLOAT_PANELS = [
+    { el: document.getElementById("fpNotif"), acts: [0, 1], enter: 0.40 },
+    { el: document.getElementById("fpIa"), acts: [1, 2], enter: 0.42 },
+    { el: document.getElementById("fpPipeline"), acts: [2, 3, 4], enter: 0.38 },
+    { el: document.getElementById("fpMetric"), acts: [4], enter: 0.48 }
+  ];
+
+  let lastCopyAct = -1;
+  let copyFadeTimer = null;
+  let kanbanLayout = null;
+  let kanbanPathEl = null;
+  let displayMetrics = [0, 0];
+  let parX = 0, parY = 0;
+  let scrollState = { act: 0, local: 0, phaseName: "build" };
+  let barHoverScale = [1, 1, 1, 1, 1, 1];
+  let globalProgress = 0;
+  let floatPhase = 0;
+
+  const stageZone = document.getElementById("stageZone");
+  const cursorGlow = document.getElementById("cursorGlow");
+
+  function updateDepthParallax(progress, cam) {
+    gsap.set("#layerGrid", {
+      y: progress * 30,
+      rotateX: 68 + cam.rx * 0.3,
+      x: parX * 0.15
+    });
+    gsap.set("#layerFogFar", { y: progress * -20 + parY * 0.2, x: parX * 0.25 });
+    gsap.set("#layerFogNear", { x: parX * 0.45, y: parY * 0.35 });
+    gsap.set("#layerVoid", { scale: 1.55 + progress * 0.05, y: progress * 10 });
+  }
+
+  function updateFloatPanels(act, local) {
+    FLOAT_PANELS.forEach((fp) => {
+      if (!fp.el) return;
+      const active = fp.acts.includes(act);
+      let op = 0;
+      if (active) {
+        const ph = phase(local);
+        if (ph.name === "build") op = smoothrange(local, fp.enter, fp.enter + 0.14);
+        else if (ph.name === "peak") op = 1;
+        else op = 1 - smoothrange(ph.t, 0, 0.45);
+      }
+      fp.el.style.opacity = op;
+    });
+  }
+
+  function updateOrbParallax() {
+    if (isMobile) return;
+    document.querySelectorAll(".float-orb").forEach((orb, i) => {
+      const d = +(orb.dataset.depth || -100);
+      const bob = Math.sin(floatPhase + i * 1.4) * 12;
+      const sway = Math.cos(floatPhase * 0.75 + i * 0.8) * 10;
+      gsap.set(orb, {
+        z: d,
+        x: sway + parX * (0.15 + i * 0.05),
+        y: bob + parY * 0.12 + globalProgress * 6
+      });
+    });
+    document.querySelectorAll(".float-panel").forEach((p, i) => {
+      if (parseFloat(p.style.opacity || 0) < 0.08) return;
+      const z = +(p.dataset.z || 140);
+      gsap.set(p, {
+        z,
+        y: Math.sin(floatPhase + i * 1.1) * 6,
+        x: Math.cos(floatPhase * 0.65 + i) * 4 + parX * 0.08
+      });
+    });
+  }
+
+  function isPeakExplore() {
+    return scrollState.phaseName === "peak" && !isMobile;
+  }
+
+  function measureKanban() {
+    const scr = screens[2];
+    const body = scr?.querySelector(".ui-body");
+    if (!body) return;
+    const prev = scr.style.opacity;
+    scr.style.opacity = "1";
+    const bodyRect = body.getBoundingClientRect();
+    const cols = ["colQual", "colProp", "colFech"].map((id) => {
+      const el = document.getElementById(id);
+      const r = el.getBoundingClientRect();
+      return { x: r.left - bodyRect.left + 8, y: r.top - bodyRect.top + 36 };
+    });
+    scr.style.opacity = prev;
+    kanbanLayout = cols;
+
+    kanbanPathEl = document.getElementById("kanbanMotionPath");
+    const svg = document.getElementById("kanbanPathSvg");
+    if (kanbanPathEl && svg && cols.length === 3) {
+      svg.setAttribute("width", bodyRect.width);
+      svg.setAttribute("height", bodyRect.height);
+      const [c0, c1, c2] = cols;
+      const cardW = bodyRect.width * 0.22;
+      const d = [
+        `M ${c0.x + cardW * 0.4} ${c0.y}`,
+        `C ${c0.x + cardW * 0.4} ${c0.y - 48}`,
+        `${c1.x + cardW * 0.4} ${c1.y - 40}`,
+        `${c1.x + cardW * 0.4} ${c1.y}`,
+        `S ${c2.x + cardW * 0.4} ${c2.y - 36}`,
+        `${c2.x + cardW * 0.4} ${c2.y}`
+      ].join(" ");
+      kanbanPathEl.setAttribute("d", d);
+    }
+  }
+
+  function pointOnKanbanPath(t) {
+    if (!kanbanPathEl) return null;
+    const len = kanbanPathEl.getTotalLength();
+    if (!len) return null;
+    const pt = kanbanPathEl.getPointAtLength(len * Math.max(0, Math.min(1, t)));
+    const cardW = kanbanPathEl.ownerSVGElement
+      ? kanbanPathEl.ownerSVGElement.clientWidth * 0.22
+      : 60;
+    return { x: pt.x - cardW * 0.15, y: pt.y - 12 };
+  }
+
+  function updateKanbanPathReveal(local) {
+    if (!kanbanPathEl) return;
+    const ph = phase(local);
+    let op = 0;
+    let dash = 1;
+    if (ph.name === "build") {
+      op = smoothrange(local, 0.20, 0.40) * 0.55;
+      dash = smoothrange(local, 0.22, 0.55);
+    } else if (ph.name === "peak") {
+      op = 0.55;
+      dash = 1;
+    } else {
+      op = 0.55 * (1 - smoothrange(ph.t, 0, 0.5));
+      dash = 1;
+    }
+    const len = kanbanPathEl.getTotalLength() || 200;
+    kanbanPathEl.style.opacity = op;
+    kanbanPathEl.style.strokeDasharray = len;
+    kanbanPathEl.style.strokeDashoffset = len * (1 - dash);
+  }
+
+  function getCameraAt(actF) {
+    const idx = Math.min(CAM_CONFIGS.length - 2, Math.max(0, Math.floor(actF)));
+    const blend = smoothstep(actF - idx);
+    const a = CAM_CONFIGS[idx];
+    const b = CAM_CONFIGS[idx + 1];
+    const local = actF - Math.floor(actF);
+    const ph = phase(local);
+
+    let drift = 0;
+    if (ph.name === "build") drift = smoothrange(ph.t, 0, 1) * 1.5;
+    else if (ph.name === "exit")  drift = smoothrange(ph.t, 0, 1) * 1.5;
+
+    return {
+      z: lerp(a.z, b.z, blend),
+      rx: lerp(a.rx, b.rx, blend) + (ph.name === "peak" ? 0 : drift * 0.4),
+      ry: lerp(a.ry, b.ry, blend) + (ph.name === "peak" ? 0 : drift * 0.6),
+      sc: lerp(a.sc, b.sc, blend)
+    };
+  }
+
+  /** Tela visível: entrada breve → peak longo → saída com overlap à próxima */
+  function screenOpacity(index, actF) {
+    const peakStart = index + 0.05;
+    const peakEnd   = index + 0.74;
+    const end       = index + 1.0;
+
+    if (actF < index) return 0;
+    if (actF >= end) return 0;
+    if (actF < peakStart) return smoothrange(actF, index, peakStart);
+    if (actF <= peakEnd) return 1;
+    return 1 - smoothrange(actF, peakEnd, end);
+  }
+
+  /** Morph de tela saindo: escala + perspectiva em vez de sumir */
+  function screenExitTransform(index, actF) {
+    const local = actF - index;
+    if (local < PEAK_END || local >= 1) return { scale: 1, y: 0, rotY: 0, filter: 0 };
+    const ph = phase(local);
+    if (ph.name !== "exit") return { scale: 1, y: 0, rotY: 0, filter: 0 };
+    const x = smoothstep(ph.t);
+    return {
+      scale: 1 - x * 0.06,
+      y: -8 * x,
+      rotY: -6 * x,
+      filter: x * 4
+    };
+  }
+
+  function updateCopy(i, local) {
+    actNum.textContent = i + 1;
+    pips.forEach((p, j) => {
+      p.classList.remove("active", "done");
+      if (j < i) p.classList.add("done");
+      if (j === i) {
+        p.classList.add("active");
+        p.style.setProperty("--fill", local);
+      }
+    });
+
+    if (i !== lastCopyAct) {
+      if (lastCopyAct === -1) {
+        actTitle.textContent = ACTS[i].title;
+        actDesc.textContent = ACTS[i].desc;
+      } else {
+        clearTimeout(copyFadeTimer);
+        actCopyWrap.classList.add("is-fading");
+        copyFadeTimer = setTimeout(() => {
+          actTitle.textContent = ACTS[i].title;
+          actDesc.textContent = ACTS[i].desc;
+          actCopyWrap.classList.remove("is-fading");
+        }, 180);
+      }
+      lastCopyAct = i;
+    }
+
+    const ctaSt = elementState(local, 0.50, 0.62, 0.90, 1.0, { yIn: 12, yOut: 0 });
+    if (i === 4) {
+      ctaBtn.style.opacity = ctaSt.opacity;
+      if (scrollState.phaseName !== "peak") {
+        gsap.set(ctaBtn, { y: ctaSt.y, x: 0 });
+      }
+      ctaBtn.style.pointerEvents = ctaSt.opacity > 0.6 ? "auto" : "none";
+    } else {
+      ctaBtn.style.opacity = 0;
+      ctaBtn.style.pointerEvents = "none";
+      gsap.set(ctaBtn, { x: 0, y: 0 });
+    }
+  }
+
+  function updateScreens(actF) {
+    screens.forEach((s, j) => {
+      const op = screenOpacity(j, actF);
+      const ex = screenExitTransform(j, actF);
+      s.style.opacity = op;
+      s.style.transform = `scale(${ex.scale}) translateY(${ex.y}px) rotateY(${ex.rotY}deg)`;
+      s.style.filter = ex.filter ? `blur(${ex.filter}px)` : "none";
+      s.classList.toggle("visible", op > 0.5);
+    });
+  }
+
+  function updateAct0(local) {
+    const header = document.querySelector('[data-act="0"] .ui-header');
+    const status = document.querySelector('[data-act="0"] .ui-status');
+    const ph = phase(local);
+    applyState(status, elementState(local, 0.04, 0.14, 0.80, 0.94, { yIn: 10 }));
+    applyState(header, elementState(local, 0.08, 0.20, 0.82, 0.96, { yIn: 16 }));
+
+    const badge = document.getElementById("badgeNew");
+    applyState(badge, elementState(local, 0.16, 0.28, 0.78, 0.92, { scaleIn: 0.6, yOut: -20, xOut: 40 }));
+
+    document.querySelectorAll('[data-act="0"] .bubble').forEach((b, j) => {
+      if (ph.name === "peak" && b.classList.contains("explore-hover")) return;
+      if (ph.name === "peak") {
+        gsap.set(b, { opacity: 1, y: 0, scale: 1, rotation: 0 });
+        return;
+      }
+      applyState(b, elementState(local, 0.20 + j * 0.12, 0.34 + j * 0.12, 0.80 + j * 0.04, 0.96, {
+        yOut: -12, xOut: 15 * (j ? 1 : -1), rotOut: j ? 3 : -2
+      }));
+    });
+
+    const chipSt = elementState(local, 0.36, 0.46, 0.76, 0.90, { yOut: -30, xOut: 55, scaleIn: 0.85 });
+    gsap.set("#chip1", { opacity: chipSt.opacity, x: chipSt.x, y: chipSt.y, scale: chipSt.scale });
+  }
+
+  function updateAct1(local) {
+    const ph = phase(local);
+    const agentCard = document.getElementById("agentCard");
+    if (!(ph.name === "peak" && agentCard.classList.contains("explore-hover"))) {
+      applyState(agentCard, elementState(local, 0.06, 0.22, 0.80, 0.94, { yIn: 28, xOut: -20, yOut: -10 }));
+    }
+
+    const tagSt = elementState(local, 0.28, 0.40, 0.82, 0.95, { scaleIn: 0.7, yOut: -8 });
+    gsap.set("#intentTag", { opacity: tagSt.opacity, scale: tagSt.scale, y: tagSt.y });
+
+    let typeOp = 0;
+    if (ph.name === "build") typeOp = smoothrange(ph.t, 0.22 / BUILD_END, 0.36 / BUILD_END);
+    else if (ph.name === "peak") typeOp = 0;
+    else typeOp = 1 - smoothrange(ph.t, 0.05, 0.35);
+    gsap.set("#typing", { opacity: typeOp });
+
+    const reply = document.querySelector('[data-act="1"] .bubble');
+    if (ph.name === "peak") {
+      gsap.set(reply, { opacity: 1, y: 0, scale: 1 });
+    } else {
+      applyState(reply, elementState(local, 0.38, 0.46, 0.84, 0.97, { yIn: 14, yOut: -18, xOut: 25, rotOut: 2 }));
+    }
+  }
+
+  function updateAct2(local) {
+    const fly = document.getElementById("flyCard");
+    if (!kanbanLayout) measureKanban();
+    if (!kanbanLayout) return;
+
+    const ph = phase(local);
+    const cols = document.querySelectorAll(".k-col");
+    cols.forEach((col, j) => {
+      if (ph.name === "peak" && col.classList.contains("explore-hover")) return;
+      applyState(col, elementState(local, 0.04 + j * 0.05, 0.16 + j * 0.05, 0.84, 0.97, { yIn: 18, scaleIn: 0.94 }));
+      if (ph.name === "peak") gsap.set(col, { opacity: 1, y: 0, scale: 1 });
+    });
+
+    updateKanbanPathReveal(local);
+
+    const cardIn = elementState(local, 0.22, 0.34, 0.78, 0.92, { scaleIn: 0.8, yIn: 30 });
+    fly.style.display = cardIn.opacity > 0.02 || local > 0.22 ? "block" : "none";
+
+    if (local >= 0.22 && local <= PEAK_END) {
+      const pathT = local < 0.55 ? smoothrange(local, 0.22, 0.55) : 1;
+      const pt = pointOnKanbanPath(pathT);
+      if (pt) {
+        const tangent = pathT < 0.99 ? pointOnKanbanPath(pathT + 0.01) : pt;
+        const rot = Math.atan2(tangent.y - pt.y, tangent.x - pt.x) * (180 / Math.PI);
+        gsap.set(fly, {
+          opacity: 1,
+          left: pt.x,
+          top: pt.y,
+          scale: 0.94 + pathT * 0.08,
+          rotation: rot * 0.35,
+          x: 0,
+          y: 0
+        });
+      }
+    } else if (ph.name === "exit") {
+      const x = smoothstep(ph.t);
+      const endPt = pointOnKanbanPath(1) || { x: 0, y: 0 };
+      gsap.set(fly, {
+        opacity: 1 - x * 0.2,
+        left: endPt.x + 30 * x,
+        top: endPt.y - 20 * x,
+        scale: 1.02 - x * 0.08,
+        rotation: 4 * x,
+        x: 0,
+        y: 0
+      });
+    } else {
+      const startPt = pointOnKanbanPath(0) || kanbanLayout[0];
+      gsap.set(fly, { opacity: cardIn.opacity, left: startPt.x, top: startPt.y, scale: cardIn.scale });
+    }
+
+    const chipSt = elementState(local, 0.40, 0.48, 0.80, 0.93, { yOut: -25, xOut: -40 });
+    gsap.set("#chip2", { opacity: chipSt.opacity, x: chipSt.x, y: chipSt.y, scale: chipSt.scale });
+  }
+
+  function updateAct3(local) {
+    applyState("#calHeader", elementState(local, 0.06, 0.18, 0.82, 0.95, { yIn: 12 }));
+
+    document.querySelectorAll(".cal-cell").forEach((cell, j) => {
+      const row = Math.floor(j / 7);
+      applyState(cell, elementState(local, 0.10 + row * 0.04, 0.22 + row * 0.04, 0.85, 0.97, { yIn: 8, scaleIn: 0.9 }));
+    });
+
+    const evSt = elementState(local, 0.32, 0.44, 0.80, 0.94, { scaleIn: 0.88, yOut: -16, xOut: 20 });
+    gsap.set("#calEvent", { opacity: evSt.opacity, scale: evSt.scale, y: evSt.y, x: evSt.x });
+  }
+
+  function updateAct4(local) {
+    const ph = phase(local);
+    document.querySelectorAll(".metric").forEach((m, j) => {
+      if (ph.name === "peak" && m.classList.contains("explore-hover")) return;
+      const st = elementState(local, 0.08 + j * 0.10, 0.24 + j * 0.10, 0.86, 0.98, { yIn: 20, yOut: -10 });
+      gsap.set(m, { opacity: st.opacity, y: st.y, scale: st.scale });
+      if (ph.name === "peak") gsap.set(m, { opacity: 1, y: 0, scale: 1 });
+
+      const val = m.querySelector(".val");
+      const target = +val.dataset.count;
+      let targetFrac = 0;
+      if (ph.name === "build") targetFrac = smoothrange(ph.t, (0.08 + j * 0.1) / BUILD_END, (0.30 + j * 0.1) / BUILD_END);
+      else if (ph.name === "peak") targetFrac = 1;
+      else targetFrac = 1;
+
+      displayMetrics[j] = lerp(displayMetrics[j], target * targetFrac, ph.name === "peak" ? 1 : 0.18);
+      if (j === 0) val.textContent = "R$ " + Math.round(displayMetrics[j]).toLocaleString("pt-BR");
+      else val.textContent = Math.round(displayMetrics[j]) + "%";
+    });
+
+    const chartSt = elementState(local, 0.28, 0.40, 0.88, 1.0, { yIn: 16, scaleIn: 0.95 });
+    gsap.set("#dashChart", { opacity: chartSt.opacity, y: chartSt.y, scale: chartSt.scale });
+
+    if (ph.name !== "build" || ph.t > 0.5) {
+      document.querySelectorAll(".bar").forEach((b, j) => {
+        const base = elementState(local, 0.34 + j * 0.05, 0.46 + j * 0.05, 0.92, 1.0, { yIn: 0 }).opacity;
+        const hoverMul = barHoverScale[j] || 1;
+        gsap.set(b, { scaleY: base * hoverMul });
+      });
+    }
+  }
+
+  const actUpdaters = [updateAct0, updateAct1, updateAct2, updateAct3, updateAct4];
+
+  function render(progress) {
+    globalProgress = progress;
+    const actF = progress * ACTS.length;
+    const i = Math.min(ACTS.length - 1, Math.floor(actF));
+    const local = actF - i;
+    const cam = getCameraAt(actF);
+
+    setCamera(
+      `perspective(2000px) rotateX(${cam.rx}deg) rotateY(${cam.ry}deg) translateZ(${cam.z}px)`
+    );
+    setDeviceStack(
+      `translate(calc(-50% + ${parX * 0.6}px), calc(-50% + ${parY * 0.5}px)) translateZ(90px) scale(${cam.sc}) rotateY(${cam.ry * 0.5}deg) rotateX(${cam.rx * 0.32}deg)`
+    );
+
+    updateDepthParallax(progress, cam);
+    updateScreens(actF);
+    updateCopy(i, local);
+
+    const actLocal = actF - i;
+    scrollState = { act: i, local: actLocal, phaseName: phase(actLocal).name };
+
+    stageZone.classList.toggle("peak-explore", isPeakExplore());
+    document.body.classList.toggle("peak-explore", isPeakExplore());
+
+    actUpdaters[i](actLocal);
+    updateFloatPanels(i, actLocal);
+
+    if (i < ACTS.length - 1 && actLocal > PEAK_END) {
+      const nextLocal = Math.max(0, actF - (i + 1));
+      if (nextLocal < BUILD_END * 0.6) actUpdaters[i + 1](nextLocal);
+    }
+
+    riverPath.style.strokeDashoffset = riverLen * (1 - progress);
+    ringFg.style.strokeDashoffset = 125.6 * (1 - progress);
+
+    gsap.set("#layerGlow", { opacity: 0.45 + progress * 0.55 });
+    gsap.set("#layerGlowGold", { opacity: progress * 0.75 });
+  }
+
+  ScrollTrigger.create({
+    trigger: "#s04-pin-wrap",
+    start: "top top",
+    end: pinAmount,
+    pin: true,
+    scrub: isMobile ? 1.6 : 2.8,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
+    onRefresh: () => {
+      kanbanLayout = null;
+      measureKanban();
+    },
+    onUpdate: (self) => render(self.progress)
+  });
+
+  window.addEventListener("resize", () => {
+    kanbanLayout = null;
+    ScrollTrigger.refresh();
+  });
+
+  if (!isMobile && window.matchMedia("(prefers-reduced-motion: no-preference)").matches) {
+    const qGlow = gsap.quickSetter("#layerGlow", "transform");
+    let mx = 0, my = 0, tx = 0, ty = 0;
+
+    document.addEventListener("mousemove", (e) => {
+      mx = (e.clientX / window.innerWidth - 0.5) * 2;
+      my = (e.clientY / window.innerHeight - 0.5) * 2;
+      if (isPeakExplore() && cursorGlow) {
+        cursorGlow.style.left = e.clientX + "px";
+        cursorGlow.style.top = e.clientY + "px";
+      }
+    });
+
+    gsap.ticker.add(() => {
+      floatPhase += 0.014;
+      tx += (mx * 12 - tx) * 0.05;
+      ty += (my * 8 - ty) * 0.05;
+      parX += (mx * 6 - parX) * 0.05;
+      parY += (my * 4.5 - parY) * 0.05;
+      qGlow(`translate(${tx}px, ${ty}px)`);
+      gsap.set("#layerGlowGold", { x: parX * 0.3, y: parY * 0.25 });
+      updateOrbParallax();
+    });
+
+    /* —— PEAK Explore Mode —— */
+    document.querySelectorAll('[data-act="0"] .bubble').forEach((b) => {
+      b.addEventListener("mouseenter", () => {
+        if (scrollState.act !== 0 || scrollState.phaseName !== "peak") return;
+        b.classList.add("explore-hover");
+        gsap.to(b, { scale: 1.04, duration: 0.35, ease: "power2.out", overwrite: "auto" });
+      });
+      b.addEventListener("mouseleave", () => {
+        b.classList.remove("explore-hover");
+        gsap.to(b, { scale: 1, duration: 0.4, ease: "power2.out" });
+      });
+    });
+
+    const agentCard = document.getElementById("agentCard");
+    agentCard.addEventListener("mouseenter", () => {
+      if (scrollState.act !== 1 || scrollState.phaseName !== "peak") return;
+      agentCard.classList.add("explore-hover");
+      gsap.to(agentCard, { scale: 1.02, y: -4, duration: 0.35, ease: "power2.out" });
+    });
+    agentCard.addEventListener("mouseleave", () => {
+      agentCard.classList.remove("explore-hover");
+      gsap.to(agentCard, { scale: 1, y: 0, duration: 0.4, ease: "power2.out" });
+    });
+
+    document.querySelectorAll(".k-col").forEach((col) => {
+      col.addEventListener("mouseenter", () => {
+        if (scrollState.act !== 2 || scrollState.phaseName !== "peak") return;
+        col.classList.add("explore-hover");
+        gsap.to(col, { scale: 1.04, duration: 0.3, ease: "power2.out" });
+      });
+      col.addEventListener("mouseleave", () => {
+        col.classList.remove("explore-hover");
+        gsap.to(col, { scale: 1, duration: 0.35, ease: "power2.out" });
+      });
+    });
+
+    document.querySelectorAll(".bar").forEach((bar, j) => {
+      bar.addEventListener("mouseenter", () => {
+        if (scrollState.act !== 4 || scrollState.phaseName !== "peak") return;
+        bar.classList.add("explore-hover");
+        barHoverScale[j] = 1.18;
+        gsap.to(bar, { scaleY: barHoverScale[j], duration: 0.45, ease: "elastic.out(1, 0.55)" });
+      });
+      bar.addEventListener("mouseleave", () => {
+        bar.classList.remove("explore-hover");
+        barHoverScale[j] = 1;
+        gsap.to(bar, { scaleY: 1, duration: 0.5, ease: "power2.out" });
+      });
+    });
+
+    document.querySelectorAll(".metric").forEach((m) => {
+      m.addEventListener("mouseenter", () => {
+        if (scrollState.act !== 4 || scrollState.phaseName !== "peak") return;
+        m.classList.add("explore-hover");
+        gsap.to(m, { scale: 1.03, duration: 0.3, ease: "power2.out" });
+      });
+      m.addEventListener("mouseleave", () => {
+        m.classList.remove("explore-hover");
+        gsap.to(m, { scale: 1, duration: 0.35, ease: "power2.out" });
+      });
+    });
+
+    document.querySelectorAll(".float-panel").forEach((panel) => {
+      panel.addEventListener("mouseenter", () => {
+        if (!isPeakExplore()) return;
+        gsap.to(panel, { scale: 1.06, z: "+=15", duration: 0.35, ease: "power2.out" });
+      });
+      panel.addEventListener("mouseleave", () => {
+        const z = +(panel.dataset.z || 140);
+        gsap.to(panel, { scale: 1, z, duration: 0.45, ease: "power2.out" });
+      });
+    });
+
+    /* Magnetic CTA — ato 5 peak */
+    ctaBtn.classList.add("magnetic-ready");
+    ctaBtn.addEventListener("mousemove", (e) => {
+      if (scrollState.act !== 4 || scrollState.phaseName !== "peak") return;
+      const r = ctaBtn.getBoundingClientRect();
+      const dx = (e.clientX - (r.left + r.width / 2)) * 0.38;
+      const dy = (e.clientY - (r.top + r.height / 2)) * 0.38;
+      gsap.to(ctaBtn, { x: dx, y: dy, duration: 0.4, ease: "power2.out", overwrite: "auto" });
+    });
+    ctaBtn.addEventListener("mouseleave", () => {
+      gsap.to(ctaBtn, { x: 0, y: 0, duration: 0.65, ease: "elastic.out(1, 0.6)" });
+    });
+  }
+
+  requestAnimationFrame(() => {
+    measureKanban();
+    render(0);
+  });
+  </script>
+</body>
+</html>

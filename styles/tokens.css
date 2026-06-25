@@ -1,0 +1,20 @@
+:root {
+  --void-deep: #010208;
+  --void-mist: #0A0E1C;
+  --surface-glass: #12182A;
+  --surface-2: #161D32;
+  --border: #1E2940;
+  --muted: #4B5E80;
+  --text: #F0F4FF;
+  --sub: #8B9EC4;
+  --violet: #B24BFF;
+  --violet-deep: #6B21A8;
+  --gold: #FFC233;
+  --cyan: #2EE8C0;
+  --success: #14F0A0;
+  --danger: #FF4D6A;
+  --wa: #25D366;
+  --chrome: #E8ECF8;
+  --nav-h: 72px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}

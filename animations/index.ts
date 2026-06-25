@@ -1,0 +1,22 @@
+/** GSAP animation hooks por seção — re-export das implementações inline nos componentes */
+export const ANIMATION_REGISTRY = {
+  S01: "sections/SectionHero — pin 360vh · F2F-001 · VID-015",
+  S02: "sections/SectionProblem — pain cards · stat counter",
+  S03: "sections/SectionBridge — tunnel rings · pillars",
+  S04: "sections/SectionDemo — 5 acts · F2F-004 · camera rig",
+  S05: "sections/SectionSetup — portal monoliths",
+  S06: "sections/SectionAgents — horizontal scroll",
+  S07: "sections/SectionInbox — inbox cols stagger",
+  S08: "sections/SectionFunnel — MotionPath card · counter",
+  S09: "sections/SectionAutomation — DrawSVG path",
+  S10: "sections/SectionBenefits — batch stars",
+  S11: "sections/SectionBeforeAfter — slider scrub",
+  S12: "sections/SectionCases — horizontal dolly",
+  S13: "sections/SectionSocial — counters · marquee",
+  S14: "sections/SectionIntegrations — orbit MotionPath",
+  S15: "sections/SectionAgency — portal scale",
+  S16: "sections/SectionSecurity — shield DrawSVG",
+  S17: "sections/SectionPricing — stagger cards",
+  S18: "sections/SectionFAQ — accordion",
+  S19: "sections/SectionCTA — F2F-016 · VID-013 · SplitText",
+} as const;
