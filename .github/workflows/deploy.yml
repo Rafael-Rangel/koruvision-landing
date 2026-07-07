@@ -20,5 +20,10 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             docker compose up -d --build
+            sleep 5
+            for i in 1 2 3 4 5; do
+              curl -sf http://127.0.0.1:13002/ > /dev/null && break
+              sleep 3
+            done
             curl -sf http://127.0.0.1:13002/ > /dev/null
             echo "Landing deploy OK"
