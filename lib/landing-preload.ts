@@ -3,7 +3,7 @@ import { fetchF2fFrameCount, preloadF2fSequence, probeF2fFrame } from "@/lib/f2f
 
 function scheduleIdle(task: () => void) {
   if (typeof window === "undefined") return;
-  if ("requestIdleCallback" in window) {
+  if (typeof window.requestIdleCallback === "function") {
     window.requestIdleCallback(task, { timeout: 5000 });
     return;
   }
