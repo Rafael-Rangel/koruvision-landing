@@ -1,14 +1,31 @@
 import { NV11_BASE } from "@/config/nv11-assets";
 import { fetchF2fFrameCount, preloadF2fSequence, probeF2fFrame } from "@/lib/f2f-frame-cache";
 
-/** Pré-carrega assets críticos do fluxo S02 (coruja). */
+function scheduleIdle(task: () => void) {
+  if (typeof window === "undefined") return;
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(task, { timeout: 5000 });
+    return;
+  }
+  window.addEventListener("load", task, { once: true });
+}
+
+/** Pré-carrega poucos frames do S02 após idle — não compete com o hero/LCP. */
 export function warmLandingAssets() {
-  void import("@/sections/SectionVisionBridge");
-  void probeF2fFrame("NV11-F2F-001", 0, NV11_BASE).then((available) => {
-    if (!available) return;
-    void fetchF2fFrameCount("NV11-F2F-001", NV11_BASE, 90).then((count) => {
-      if (count < 4) return;
-      preloadF2fSequence("NV11-F2F-001", count, NV11_BASE, { priorityCount: 24, concurrency: 6 });
+  if (typeof window === "undefined") return;
+  if (window.matchMedia("(max-width: 900px)").matches) return;
+
+  scheduleIdle(() => {
+    void import("@/sections/SectionVisionBridge");
+    void probeF2fFrame("NV11-F2F-001", 0, NV11_BASE).then((available) => {
+      if (!available) return;
+      void fetchF2fFrameCount("NV11-F2F-001", NV11_BASE, 90).then((count) => {
+        if (count < 4) return;
+        preloadF2fSequence("NV11-F2F-001", count, NV11_BASE, {
+          priorityCount: 8,
+          concurrency: 3,
+        });
+      });
     });
   });
 }

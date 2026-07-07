@@ -17,6 +17,16 @@ interface SmartVideoProps {
   onError?: () => void;
 }
 
+function videoSources(src: string) {
+  if (src.endsWith(".webm")) {
+    return { webm: src, mp4: src.replace(/\.webm$/i, ".mp4") };
+  }
+  if (src.endsWith(".mp4")) {
+    return { webm: src.replace(/\.mp4$/i, ".webm"), mp4: src };
+  }
+  return { webm: `${src}.webm`, mp4: src };
+}
+
 export function SmartVideo({
   src,
   poster,
@@ -72,6 +82,8 @@ export function SmartVideo({
     }
   }, [mobileBlocked, shouldLoad, visible]);
 
+  const sources = videoSources(src);
+
   return (
     <video
       ref={ref}
@@ -83,8 +95,14 @@ export function SmartVideo({
       poster={poster}
       onLoadedData={onLoadedData}
       onError={onError}
+      aria-hidden
     >
-      {shouldLoad && !mobileBlocked ? <source src={src} type="video/mp4" /> : null}
+      {shouldLoad && !mobileBlocked ? (
+        <>
+          <source src={sources.webm} type="video/webm" />
+          <source src={sources.mp4} type="video/mp4" />
+        </>
+      ) : null}
     </video>
   );
 }

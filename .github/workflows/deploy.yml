@@ -19,6 +19,7 @@ jobs:
             cd ${{ secrets.VPS_LANDING_PATH }}
             git fetch origin main
             git reset --hard origin/main
+            rm -rf public/assets/nv5 public/assets/nv6 public/assets/nv7 public/assets/nv8 public/assets/nv9 public/assets/nv10 || true
             docker compose up -d --build
             sleep 5
             for i in 1 2 3 4 5; do

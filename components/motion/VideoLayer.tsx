@@ -35,6 +35,8 @@ export function VideoLayer({
 
   const src = videoPath(filename, assetBase);
   const poster = posterImage ? imagePath(posterImage, assetBase) : undefined;
+  const webmSrc = src.endsWith(".webm") ? src : src.replace(/\.mp4$/i, ".webm");
+  const mp4Src = src.endsWith(".webm") ? src.replace(/\.webm$/i, ".mp4") : src;
 
   return (
     <video
@@ -45,12 +47,13 @@ export function VideoLayer({
       muted
       loop={loop}
       playsInline
-      preload="auto"
+      preload="none"
       poster={poster}
       onLoadedData={() => setReady(true)}
       onError={() => setReady(false)}
     >
-      <source src={src} type="video/mp4" />
+      <source src={webmSrc} type="video/webm" />
+      <source src={mp4Src} type="video/mp4" />
     </video>
   );
 }

@@ -3,6 +3,8 @@
 import type { CSSProperties } from "react";
 import { CrmCard3D } from "@/components/hero/CrmCard3D";
 import { HeroAmbientBg } from "@/components/hero/HeroAmbientBg";
+import { SmartVideo } from "@/components/performance/SmartVideo";
+import { videoPath } from "@/config/env";
 
 interface HeroExperienceProps {
   layers: [string, string, string];
@@ -13,20 +15,23 @@ interface HeroExperienceProps {
 }
 
 /** Hero — mockup emerge de baixo por cima do texto; fundo animado. */
-export function HeroExperience({ progress, bgVideo, heroVideo }: HeroExperienceProps) {
+export function HeroExperience({ progress, bgVideo, heroVideo, assetBase }: HeroExperienceProps) {
   const ambientVideo = bgVideo || heroVideo;
+  const src = ambientVideo ? videoPath(ambientVideo, assetBase) : "";
 
   return (
     <div className="hero-experience hero-experience--rise" style={{ "--hero-p": progress } as CSSProperties}>
-      {ambientVideo ? (
-        <video
+      {src ? (
+        <SmartVideo
+          src={src}
           className="s01-hero-bg-video"
-          src={ambientVideo}
-          autoPlay
+          eager={false}
+          preload="none"
+          disableOnMobile
+          rootMargin="0px"
+          loop
           muted
           playsInline
-          preload="metadata"
-          aria-hidden
         />
       ) : null}
       <HeroAmbientBg progress={progress} />

@@ -18,12 +18,6 @@ function preloadAround(
   }
 }
 
-function preloadAll(sequenceId: string, frameCount: number, assetBase: string | undefined) {
-  for (let i = 0; i < frameCount; i++) {
-    void preloadF2fFrame(sequenceId, i, frameCount, assetBase);
-  }
-}
-
 interface FrameScrubberProps {
   sequenceId: string;
   progress: number;
@@ -34,8 +28,6 @@ interface FrameScrubberProps {
   objectPosition?: string;
   crossfade?: boolean;
 }
-
-const EAGER_PRELOAD_MAX = 140;
 
 function parseObjectPosition(pos: string) {
   const parts = pos.trim().split(/\s+/);
@@ -95,11 +87,7 @@ export function FrameScrubber({
 
   useEffect(() => {
     if (!env.enableF2f) return;
-    if (frameCount <= EAGER_PRELOAD_MAX) {
-      preloadAll(sequenceId, frameCount, assetBase);
-    } else {
-      preloadAround(sequenceId, frameA, frameCount, assetBase);
-    }
+    preloadAround(sequenceId, frameA, frameCount, assetBase);
   }, [sequenceId, assetBase, frameCount, frameA]);
 
   const checkReady = useCallback(

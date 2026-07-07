@@ -1,0 +1,18 @@
+node_modules
+.next
+.git
+.github
+*.md
+.env
+.env.*
+
+# Variantes antigas — permanecem no git, não entram na imagem de produção
+public/assets/nv5
+public/assets/nv6
+public/assets/nv7
+public/assets/nv8
+public/assets/nv9
+public/assets/nv10
+
+# MP4 legado — produção usa WebM otimizado
+public/assets/**/*.mp4

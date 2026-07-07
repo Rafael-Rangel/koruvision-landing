@@ -584,16 +584,19 @@ body.lps-active #cena-problema .problem-mega-card__cta--points-bar .scene-points
 
 .lps-p4__hero {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
-  gap: clamp(16px, 2.5vw, 28px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 56px);
   align-items: center;
+  justify-items: center;
   min-height: 0;
+  width: 100%;
 }
 
 .lps-p4__three-d {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   min-height: clamp(240px, 38dvh, 380px);
   will-change: opacity, transform;
 }
@@ -605,6 +608,8 @@ body.lps-active #cena-problema .problem-mega-card__cta--points-bar .scene-points
 
 .lps-p4__preview-wrap {
   position: relative;
+  z-index: 3;
+  width: 100%;
   min-height: clamp(280px, 42dvh, 420px);
   display: flex;
   align-items: center;
@@ -613,7 +618,7 @@ body.lps-active #cena-problema .problem-mega-card__cta--points-bar .scene-points
 
 .lps-p4__preview-glow {
   position: absolute;
-  inset: 8% 4%;
+  inset: 6% 8%;
   border-radius: 28px;
   background: radial-gradient(ellipse 70% 60% at 50% 45%, rgba(139, 92, 246, 0.35), transparent 70%);
   filter: blur(24px);
@@ -629,7 +634,10 @@ body.lps-active #cena-problema .problem-mega-card__cta--points-bar .scene-points
 
 .lps-p4-preview {
   position: relative;
+  z-index: 1;
   width: 100%;
+  max-width: 480px;
+  margin-inline: auto;
   aspect-ratio: 16 / 11;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
