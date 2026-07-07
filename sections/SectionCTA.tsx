@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { getSection } from "@/config/sections";
+import { CRM_URLS } from "@/lib/crm-url";
 import { PinWrap } from "@/components/sections/SectionShell";
 import { SectionMediaLayers } from "@/components/motion/SectionMediaLayers";
 import { MagneticButton } from "@/components/motion/MagneticButton";
@@ -46,8 +47,8 @@ export function SectionCTA() {
           </h2>
           <p className="section-lede" style={{ margin: "0 auto 24px" }}>{cfg.subheadline}</p>
           <div className="cta-row center">
-            <MagneticButton href="#">{cfg.ctaPrimary}</MagneticButton>
-            <MagneticButton href="#" variant="ghost">{cfg.ctaSecondary}</MagneticButton>
+            <MagneticButton href={CRM_URLS.signup}>{cfg.ctaPrimary}</MagneticButton>
+            <MagneticButton href={CRM_URLS.interesse} variant="ghost">{cfg.ctaSecondary}</MagneticButton>
           </div>
         </div>
       </div>

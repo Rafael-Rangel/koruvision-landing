@@ -5,6 +5,7 @@ export const env = {
   enableVideo: process.env.NEXT_PUBLIC_ENABLE_VIDEO !== "false",
   mobileBreakpoint: Number(process.env.NEXT_PUBLIC_MOBILE_BREAKPOINT ?? 900),
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+  crmUrl: process.env.NEXT_PUBLIC_CRM_URL ?? "https://crm.koruvision.com.br",
 } as const;
 
 export function assetPath(...parts: string[]): string {

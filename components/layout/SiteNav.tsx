@@ -1,6 +1,7 @@
 "use client";
 
 import { MagneticButton } from "@/components/motion/MagneticButton";
+import { CRM_URLS } from "@/lib/crm-url";
 
 export function SiteNav() {
   return (
@@ -14,7 +15,7 @@ export function SiteNav() {
         <a href="#s10">Benefícios</a>
         <a href="#s17">Planos</a>
         <a href="#s18">FAQ</a>
-        <MagneticButton href="#s19" className="nav-cta">
+        <MagneticButton href={CRM_URLS.signup} className="nav-cta">
           Começar grátis
         </MagneticButton>
       </div>

@@ -11,6 +11,7 @@ import { MacMetricsMockup } from "@/components/product/MacWindowMockup";
 import { gsap } from "@/lib/gsap/register";
 import { smoothrange } from "@/lib/motion-system";
 import type { SectionConfig } from "@/config/sections";
+import { CRM_URLS } from "@/lib/crm-url";
 
 export function SectionEcosystemCta({ cfg }: { cfg: SectionConfig }) {
   const pinRef = useRef<HTMLDivElement>(null);
@@ -56,7 +57,7 @@ export function SectionEcosystemCta({ cfg }: { cfg: SectionConfig }) {
               Centralize leads, automatize respostas, acompanhe o funil e veja o resultado em um dashboard claro.
             </p>
             <div className="cta-row">
-              <MagneticButton href="#">{cfg.ctaPrimary ?? "Agendar demonstração"}</MagneticButton>
+              <MagneticButton href={CRM_URLS.signup}>{cfg.ctaPrimary ?? "Agendar demonstração"}</MagneticButton>
               <MagneticButton href="#s04" variant="ghost">Explorar plataforma</MagneticButton>
             </div>
           </div>

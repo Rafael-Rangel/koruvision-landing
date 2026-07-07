@@ -63,7 +63,7 @@ export function LpsPlans() {
           ))}
         </div>
         <div className="lps-actions" style={{ marginTop: "2rem", justifyContent: "center" }}>
-          <a href="#lps-cta" className="lps-btn lps-btn--primary">
+          <a href={LPS.signupHref} className="lps-btn lps-btn--primary">
             {LPS.ctaPrimary}
           </a>
         </div>

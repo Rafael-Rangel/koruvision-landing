@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { LPS } from "../config";
 
 export function LpsNav() {
@@ -13,9 +12,9 @@ export function LpsNav() {
         <a href="#lps-prova">Prova</a>
         <a href="#lps-planos">Planos</a>
       </nav>
-      <Link href="#lps-cta" className="lps-btn lps-btn--primary" style={{ padding: "0.55rem 1rem", fontSize: "0.8rem" }}>
+      <a href={LPS.signupHref} className="lps-btn lps-btn--primary" style={{ padding: "0.55rem 1rem", fontSize: "0.8rem" }}>
         {LPS.ctaPrimary}
-      </Link>
+      </a>
     </header>
   );
 }

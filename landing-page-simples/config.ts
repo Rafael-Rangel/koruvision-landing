@@ -1,4 +1,5 @@
 import { nv11Image, NV11_IMAGES } from "@/config/nv11-assets";
+import { CRM_URLS } from "@/lib/crm-url";
 import {
   HERO_CFG,
   PROBLEM_CFG,
@@ -23,8 +24,11 @@ export const LPS = {
   tagline: "CRM + IA · WhatsApp",
   ctaPrimary: "Começar grátis — 14 dias",
   ctaSecondary: "Ver planos",
-  ctaHref: "#lps-planos",
+  ctaHref: CRM_URLS.signup,
   demoHref: "#lps-demo",
+  signupHref: CRM_URLS.signup,
+  loginHref: CRM_URLS.login,
+  interesseHref: CRM_URLS.interesse,
 } as const;
 
 export const LPS_HERO = {

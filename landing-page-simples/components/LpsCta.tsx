@@ -54,7 +54,7 @@ export function LpsCta() {
           {LPS_CTA.subheadline}
         </p>
         <div className="lps-actions" style={{ justifyContent: "center" }}>
-          <a href="#" className="lps-btn lps-btn--primary">
+          <a href={LPS.signupHref} className="lps-btn lps-btn--primary">
             {LPS.ctaPrimary}
           </a>
           <a href="#lps-planos" className="lps-btn lps-btn--ghost">

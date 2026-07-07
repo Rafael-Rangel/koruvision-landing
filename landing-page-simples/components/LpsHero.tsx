@@ -99,7 +99,7 @@ export function LpsHero() {
           </h1>
           <p className="lps-sub lps-hero__sub">{LPS_HERO.subheadline}</p>
           <div className="lps-actions lps-hero__actions">
-            <a href="#lps-cta" className="lps-btn lps-btn--primary">
+            <a href={LPS.signupHref} className="lps-btn lps-btn--primary">
               {LPS.ctaPrimary}
             </a>
             <a href={LPS.demoHref} className="lps-btn lps-btn--ghost">

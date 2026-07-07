@@ -1,3 +1,5 @@
+import { CRM_URLS } from "@/lib/crm-url";
+
 export function SiteFooter() {
   return (
     <footer className="site-footer">
@@ -13,7 +15,7 @@ export function SiteFooter() {
           <a href="#s04">Demo</a>
           <a href="#s17">Planos</a>
           <a href="#s18">FAQ</a>
-          <a href="#s19">Começar grátis</a>
+          <a href={CRM_URLS.signup}>Começar grátis</a>
         </div>
         <p className="footer-copy">© {new Date().getFullYear()} KORUVISION. Todos os direitos reservados.</p>
       </div>

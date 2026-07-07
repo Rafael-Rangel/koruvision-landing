@@ -1,0 +1,24 @@
+name: Deploy landing VPS
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            cd ${{ secrets.VPS_LANDING_PATH }}
+            git fetch origin main
+            git reset --hard origin/main
+            docker compose up -d --build
+            curl -sf http://127.0.0.1:13002/ > /dev/null
+            echo "Landing deploy OK"
