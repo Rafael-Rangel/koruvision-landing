@@ -1,8 +1,28 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { env } from "@/config/env";
 import { F2F_SEQUENCES, getF2fFramePath } from "@/config/assets";
+import { getF2fCache, preloadF2fFrame } from "@/lib/f2f-frame-cache";
+
+function preloadAround(
+  sequenceId: string,
+  center: number,
+  frameCount: number,
+  assetBase: string | undefined
+) {
+  void preloadF2fFrame(sequenceId, center, frameCount, assetBase);
+  for (let d = 1; d <= 10; d++) {
+    void preloadF2fFrame(sequenceId, center - d, frameCount, assetBase);
+    void preloadF2fFrame(sequenceId, center + d, frameCount, assetBase);
+  }
+}
+
+function preloadAll(sequenceId: string, frameCount: number, assetBase: string | undefined) {
+  for (let i = 0; i < frameCount; i++) {
+    void preloadF2fFrame(sequenceId, i, frameCount, assetBase);
+  }
+}
 
 interface FrameScrubberProps {
   sequenceId: string;
@@ -11,8 +31,31 @@ interface FrameScrubberProps {
   frameCount?: number;
   blendMode?: "normal" | "screen" | "overlay";
   assetBase?: string;
+  objectPosition?: string;
+  crossfade?: boolean;
 }
 
+const EAGER_PRELOAD_MAX = 140;
+
+function parseObjectPosition(pos: string) {
+  const parts = pos.trim().split(/\s+/);
+  const axis = (v: string, fallback: number) => {
+    if (!v || v === "center") return fallback;
+    if (v.endsWith("%")) return parseFloat(v) / 100;
+    if (v === "left" || v === "top") return 0;
+    if (v === "right" || v === "bottom") return 1;
+    return fallback;
+  };
+  return { x: axis(parts[0], 0.5), y: axis(parts[1] ?? parts[0], 0.5) };
+}
+
+function isFrameReady(img: HTMLImageElement | undefined) {
+  return Boolean(img?.complete && img.naturalWidth > 0);
+}
+
+/**
+ * Scrub F2F via WebP — crossfade entre frames adjacentes para scroll contínuo.
+ */
 export function FrameScrubber({
   sequenceId,
   progress,
@@ -20,101 +63,133 @@ export function FrameScrubber({
   frameCount: frameCountProp,
   blendMode = "normal",
   assetBase,
+  objectPosition = "center center",
+  crossfade = true,
 }: FrameScrubberProps) {
   const meta = F2F_SEQUENCES[sequenceId];
-  const frameCount = frameCountProp ?? meta?.frames ?? 120;
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cacheRef = useRef<Map<number, HTMLImageElement>>(new Map());
-  const rafRef = useRef<number>(0);
+  const [manifestCount, setManifestCount] = useState<number | null>(null);
+  const frameCount = manifestCount ?? frameCountProp ?? meta?.frames ?? 120;
+  const floatIndex = Math.max(0, Math.min(frameCount - 1, progress * (frameCount - 1)));
+  const frameA = Math.floor(floatIndex);
+  const frameB = Math.min(frameA + 1, frameCount - 1);
+  const mix = crossfade ? floatIndex - frameA : 0;
   const [hasFrames, setHasFrames] = useState(false);
-  const lastFrameRef = useRef(-1);
+  const [failed, setFailed] = useState(false);
+  const lastGoodRef = useRef({ a: 0, b: 0, mix: 0 });
 
-  const drawFrame = useCallback(
-    (index: number) => {
-      const canvas = canvasRef.current;
-      if (!canvas || !env.enableF2f) return;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+  const base = useMemo(() => (assetBase ?? env.assetBase).replace(/\/$/, ""), [assetBase]);
+  const pos = useMemo(() => parseObjectPosition(objectPosition), [objectPosition]);
 
-      const clamped = Math.max(0, Math.min(frameCount - 1, Math.floor(index)));
-      if (clamped === lastFrameRef.current) return;
-      lastFrameRef.current = clamped;
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${base}/f2f/${sequenceId}/manifest.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((m) => {
+        if (!cancelled && m?.count) setManifestCount(m.count);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [base, sequenceId]);
 
-      const draw = (img: HTMLImageElement) => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
-        const w = img.width * scale;
-        const h = img.height * scale;
-        ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+  useEffect(() => {
+    if (!env.enableF2f) return;
+    if (frameCount <= EAGER_PRELOAD_MAX) {
+      preloadAll(sequenceId, frameCount, assetBase);
+    } else {
+      preloadAround(sequenceId, frameA, frameCount, assetBase);
+    }
+  }, [sequenceId, assetBase, frameCount, frameA]);
+
+  const checkReady = useCallback(
+    (a: number, b: number) => {
+      const cache = getF2fCache(sequenceId, assetBase);
+      const imgA = cache.get(a);
+      if (isFrameReady(imgA)) {
         setHasFrames(true);
-      };
-
-      const cached = cacheRef.current.get(clamped);
-      if (cached?.complete && cached.naturalWidth) {
-        draw(cached);
-        return;
+        setFailed(false);
+        return true;
       }
-
-      const img = new Image();
-      img.onload = () => {
-        cacheRef.current.set(clamped, img);
-        draw(img);
-        // Preload adjacent frames
-        [clamped - 1, clamped + 1, clamped + 2].forEach((i) => {
-          if (i < 0 || i >= frameCount || cacheRef.current.has(i)) return;
-          const pre = new Image();
-          pre.onload = () => cacheRef.current.set(i, pre);
-          pre.src = getF2fFramePath(sequenceId, i, assetBase);
-        });
-      };
-      img.onerror = () => {
-        if (!hasFrames) {
-          ctx.fillStyle = "rgba(1,2,8,0)";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-      };
-      img.src = getF2fFramePath(sequenceId, clamped, assetBase);
+      if (a === 0 && imgA) {
+        const onLoad = () => {
+          setHasFrames(true);
+          setFailed(false);
+        };
+        const onError = () => setFailed(true);
+        imgA.addEventListener("load", onLoad, { once: true });
+        imgA.addEventListener("error", onError, { once: true });
+      }
+      return false;
     },
-    [frameCount, sequenceId, hasFrames, assetBase]
+    [sequenceId, assetBase]
   );
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const resize = () => {
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = parent.clientWidth * dpr;
-      canvas.height = parent.clientHeight * dpr;
-      canvas.style.width = `${parent.clientWidth}px`;
-      canvas.style.height = `${parent.clientHeight}px`;
-      lastFrameRef.current = -1;
-    };
-    resize();
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-  }, []);
+    checkReady(frameA, frameB);
+  }, [frameA, frameB, checkReady]);
 
-  useEffect(() => {
-    cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(() => {
-      drawFrame(progress * (frameCount - 1));
-    });
-  }, [progress, frameCount, drawFrame]);
+  if (!env.enableF2f || !meta) return null;
 
-  useEffect(() => {
-    drawFrame(0);
-  }, [drawFrame]);
+  const cache = getF2fCache(sequenceId, assetBase);
+  const frameAReady = isFrameReady(cache.get(frameA));
+  const frameBReady = isFrameReady(cache.get(frameB));
 
-  if (!env.enableF2f) return null;
+  if (frameAReady) {
+    lastGoodRef.current = { a: frameA, b: frameB, mix };
+  }
+
+  const showA = frameAReady ? frameA : lastGoodRef.current.a;
+  const showB = frameBReady || frameA === frameB ? frameB : lastGoodRef.current.b;
+  const showMix = frameAReady ? mix : lastGoodRef.current.mix;
+
+  const imgStyle = {
+    objectFit: "cover" as const,
+    objectPosition,
+  };
+
+  const stackStyle = {
+    mixBlendMode: blendMode,
+    ["--frame-pos-x" as string]: `${pos.x * 100}%`,
+    ["--frame-pos-y" as string]: `${pos.y * 100}%`,
+  };
+
+  if (!crossfade || showA === showB) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={getF2fFramePath(sequenceId, showA, assetBase)}
+        alt=""
+        aria-hidden
+        decoding="async"
+        className={`frame-scrubber ${hasFrames ? "frame-scrubber--active" : ""} ${failed ? "frame-scrubber--failed" : ""} ${className}`}
+        style={{ ...imgStyle, mixBlendMode: blendMode }}
+      />
+    );
+  }
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={`frame-scrubber ${hasFrames ? "frame-scrubber--active" : ""} ${className}`}
-      style={{ mixBlendMode: blendMode }}
+    <div
+      className={`frame-scrubber-stack ${hasFrames ? "frame-scrubber--active" : ""} ${failed ? "frame-scrubber--failed" : ""} ${className}`}
+      style={stackStyle}
       aria-hidden
-    />
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={getF2fFramePath(sequenceId, showA, assetBase)}
+        alt=""
+        decoding="async"
+        className="frame-scrubber-stack__layer"
+        style={{ ...imgStyle, opacity: 1 - showMix }}
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={getF2fFramePath(sequenceId, showB, assetBase)}
+        alt=""
+        decoding="async"
+        className="frame-scrubber-stack__layer"
+        style={{ ...imgStyle, opacity: showMix }}
+      />
+    </div>
   );
 }

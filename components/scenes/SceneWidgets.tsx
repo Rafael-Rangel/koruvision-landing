@@ -2,9 +2,12 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { gsap, registerGsap } from "@/lib/gsap/register";
+import { smoothrange } from "@/lib/motion-system";
 import { InteractiveSurface } from "@/components/motion/InteractiveSurface";
 import { NeuralFlowCanvas } from "@/components/motion/NeuralFlowCanvas";
 import { MacInboxMockup, MacAutomationMockup, MacMetricsMockup } from "@/components/product/MacWindowMockup";
+import { RealProductScreen } from "@/components/product/RealProductScreen";
+import { resolveProofMetric } from "@/config/real-assets";
 import { DeviceShell, UIKanbanBoard, UIAgencyTenants } from "@/components/golden/GoldenUI";
 import {
   SETUP_STEPS,
@@ -16,15 +19,58 @@ import {
   INTEGRATIONS,
   PLANS,
   FAQ,
+  PILLARS,
 } from "@/config/landing-v10";
+
+/* ───────────── Pilares (A virada) ───────────── */
+const PILLAR_ICONS: Record<string, string> = {
+  atendimento: "◎",
+  ia: "◈",
+  pipeline: "▣",
+  automacao: "⬡",
+};
+
+export function PillarsVisual({ progress = 0 }: { progress?: number }) {
+  const activeIdx = Math.min(PILLARS.length - 1, Math.floor(progress * (PILLARS.length + 0.35)));
+
+  return (
+    <div className="v-pillars-rail" aria-label="Quatro pilares da plataforma">
+      {PILLARS.map((pillar, i) => {
+        const lit = i <= activeIdx;
+        const pulse = smoothrange(progress, 0.15 + i * 0.12, 0.38 + i * 0.12);
+        return (
+          <InteractiveSurface
+            key={pillar.key}
+            className={`v-pillar-card${lit ? " is-lit" : ""}`}
+            intensity={lit ? 0.55 : 0.25}
+            glow={lit && i === activeIdx}
+          >
+            <span className="v-pillar-card__icon" aria-hidden>
+              {PILLAR_ICONS[pillar.key] ?? "◆"}
+            </span>
+            <div className="v-pillar-card__body">
+              <strong>{pillar.title}</strong>
+              <p>{pillar.copy}</p>
+            </div>
+            <span className="v-pillar-card__meter" style={{ "--fill": String(lit ? Math.max(pulse, 0.35) : 0) } as CSSProperties} />
+          </InteractiveSurface>
+        );
+      })}
+    </div>
+  );
+}
 
 /* ───────────── Agentes de IA ───────────── */
 export function AgentsVisual() {
   return (
     <div className="v-agents">
       <NeuralFlowCanvas className="v-agents-neural" />
-      <MacAutomationMockup className="v-agents-mockup v-agents-mockup--auto" tilt />
-      <MacInboxMockup className="v-agents-mockup v-agents-mockup--inbox" tilt />
+      <RealProductScreen slot="agents.automation" className="v-agents-mockup v-agents-mockup--auto">
+        <MacAutomationMockup className="v-agents-mockup v-agents-mockup--auto" tilt />
+      </RealProductScreen>
+      <RealProductScreen slot="agents.inbox" className="v-agents-mockup v-agents-mockup--inbox">
+        <MacInboxMockup className="v-agents-mockup v-agents-mockup--inbox" tilt />
+      </RealProductScreen>
     </div>
   );
 }
@@ -203,6 +249,40 @@ export function CasesVisual() {
   );
 }
 
+/* ───────────── Prova unificada (stats + depoimentos + integrações) ───────────── */
+export function ProofVisual() {
+  return (
+    <div className="v-proof">
+      <div className="v-proof-stats">
+        {SOCIAL_STATS.map((s) => (
+          <div key={s.label} className="v-proof-stat" data-ambient-breathe>
+            <strong>{resolveProofMetric(s.label, s.value)}</strong>
+            <span>{s.label}</span>
+          </div>
+        ))}
+      </div>
+      <div className="v-proof-quotes">
+        {TESTIMONIALS.slice(0, 2).map((t) => (
+          <InteractiveSurface key={t.name} className="v-proof-quote" intensity={0.35}>
+            <p>“{t.quote}”</p>
+            <div className="v-quote-who">
+              <strong>{t.name}</strong>
+              <span>{t.role}</span>
+            </div>
+          </InteractiveSurface>
+        ))}
+      </div>
+      <div className="v-proof-integrations" aria-label="Integrações">
+        {INTEGRATIONS.slice(0, 8).map((n) => (
+          <span key={n} className="v-proof-chip">
+            {n}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ───────────── Social proof ───────────── */
 export function SocialVisual() {
   return (
@@ -266,20 +346,59 @@ export function AgencyVisual() {
 }
 
 /* ───────────── Planos + FAQ ───────────── */
+const PLAN_PRICE_NUM: Record<string, number> = {
+  Starter: 97,
+  Pro: 197,
+  Agency: 497,
+};
+
+function formatPlanPrice(value: number) {
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+}
+
 export function PlansVisual() {
+  const [annual, setAnnual] = useState(false);
+
   return (
     <div className="v-plans-wrap">
+      <div className="v-plans-billing">
+        <button
+          type="button"
+          className={`v-plans-billing__opt${!annual ? " is-active" : ""}`}
+          onClick={() => setAnnual(false)}
+        >
+          Mensal
+        </button>
+        <button
+          type="button"
+          className={`v-plans-billing__opt${annual ? " is-active" : ""}`}
+          onClick={() => setAnnual(true)}
+        >
+          Anual
+          <em>−20%</em>
+        </button>
+      </div>
       <div className="v-plans">
-        {PLANS.map((p) => (
-          <InteractiveSurface key={p.name} className={`v-plan ${p.popular ? "v-plan--popular" : ""}`} intensity={0.4} glow={p.popular}>
-            {p.popular && <span className="v-plan-badge">Mais escolhido</span>}
-            <h3>{p.name}</h3>
-            <div className="v-plan-price">{p.price}<span>{p.period}</span></div>
-            <p className="v-plan-copy">{p.copy}</p>
-            <ul>{p.features.map((f) => <li key={f}>{f}</li>)}</ul>
-            <a className={p.popular ? "btn-primary" : "btn-ghost"} href="#s-cta-eco">Começar grátis</a>
-          </InteractiveSurface>
-        ))}
+        {PLANS.map((p) => {
+          const base = PLAN_PRICE_NUM[p.name] ?? 0;
+          const price = annual ? Math.round(base * 0.8) : base;
+          const period = annual ? "/mês · cobrado anualmente" : p.period;
+          return (
+            <InteractiveSurface key={p.name} className={`v-plan ${p.popular ? "v-plan--popular" : ""}`} intensity={0.4} glow={p.popular}>
+              {p.popular && <span className="v-plan-badge">Mais escolhido</span>}
+              <h3>{p.name}</h3>
+              <div className="v-plan-price">
+                <span className="v-plan-price__value">{formatPlanPrice(price)}</span>
+                <span className="v-plan-price__period">{period}</span>
+              </div>
+              <p className="v-plan-copy">{p.copy}</p>
+              <ul>{p.features.map((f) => <li key={f}>{f}</li>)}</ul>
+              <a className={p.popular ? "btn-primary" : "btn-ghost"} href="#s-cta-eco">
+                Começar grátis
+              </a>
+            </InteractiveSurface>
+          );
+        })}
       </div>
       <div className="v-faq">
         {FAQ.map((item) => (

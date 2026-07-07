@@ -10,6 +10,7 @@ interface F2fVideoScrubberProps {
   assetBase?: string;
   className?: string;
   objectPosition?: string;
+  onReady?: () => void;
 }
 
 /**
@@ -22,9 +23,11 @@ export function F2fVideoScrubber({
   assetBase,
   className = "",
   objectPosition = "center 38%",
+  onReady,
 }: F2fVideoScrubberProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
   const meta = F2F_SEQUENCES[sequenceId];
   const src = meta ? videoPath(meta.sourceVideo, assetBase) : "";
 
@@ -39,6 +42,7 @@ export function F2fVideoScrubber({
         v.currentTime = t;
       }
       setReady(true);
+      onReady?.();
     };
 
     seek();
@@ -48,20 +52,21 @@ export function F2fVideoScrubber({
       v.removeEventListener("loadedmetadata", seek);
       v.removeEventListener("loadeddata", seek);
     };
-  }, [progress, src]);
+  }, [progress, src, onReady]);
 
   if (!meta || !src) return null;
 
   return (
     <video
       ref={videoRef}
-      className={`f2f-video-scrubber ${ready ? "f2f-video-scrubber--ready" : ""} ${className}`}
+      className={`f2f-video-scrubber ${ready ? "f2f-video-scrubber--ready" : ""} ${failed ? "f2f-video-scrubber--failed" : ""} ${className}`}
       src={src}
       muted
       playsInline
       preload="auto"
       aria-hidden
       style={{ objectPosition }}
+      onError={() => setFailed(true)}
     />
   );
 }

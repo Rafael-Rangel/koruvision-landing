@@ -82,15 +82,13 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     loop2: NV11_LOOPS.owlBreath,
     loopOpacity: 0.18,
     f2f: "NV11-F2F-000",
-    pinVh: 220,
-    pinMobileVh: 180,
+    pinVh: 160,
+    pinMobileVh: 135,
     nextHue: 265,
   },
   C02: {
     id: "C02",
     domId: "s02-vision",
-    bg: NV11_IMAGES.owlPoster,
-    poster: NV11_IMAGES.owlPoster,
     f2f: "NV11-F2F-001",
     pinVh: 160,
     pinMobileVh: 130,
@@ -101,9 +99,9 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     domId: "cena-problema",
     bg: NV11_IMAGES.problemChaos,
     loop: NV11_LOOPS.chaosDrift,
-    loopOpacity: 0.26,
-    pinVh: 165,
-    pinMobileVh: 145,
+    loopOpacity: 0.44,
+    pinVh: 230,
+    pinMobileVh: 185,
     nextHue: 200,
   },
   C04: {
@@ -111,7 +109,7 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     domId: "cena-pilares",
     bg: NV11_IMAGES.pillars,
     loop: NV11_LOOPS.pillarsPulse,
-    pinVh: 130,
+    pinVh: 95,
     nextHue: 220,
   },
   C05: {
@@ -120,8 +118,8 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     bg: NV11_IMAGES.demoMachine,
     loop: NV11_LOOPS.demoCorridor,
     f2f: "NV11-F2F-002",
-    pinVh: 280,
-    pinMobileVh: 200,
+    pinVh: 185,
+    pinMobileVh: 145,
     nextHue: 175,
   },
   C06: {
@@ -129,7 +127,7 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     domId: "cena-setup",
     bg: NV11_IMAGES.setupPortals,
     loop: NV11_LOOPS.portalsFlow,
-    pinVh: 120,
+    pinVh: 90,
     nextHue: 265,
   },
   C07: {
@@ -137,7 +135,7 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     domId: "cena-agentes",
     bg: NV11_IMAGES.neuralField,
     loop: NV11_LOOPS.neuralPulse,
-    pinVh: 140,
+    pinVh: 100,
     nextHue: 150,
   },
   C08: {
@@ -153,7 +151,7 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     domId: "cena-funil",
     bg: NV11_IMAGES.funnelGravity,
     loop: NV11_LOOPS.funnelOrbs,
-    pinVh: 150,
+    pinVh: 100,
     nextHue: 210,
   },
   C10: {
@@ -161,7 +159,7 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     domId: "cena-automacoes",
     bg: NV11_IMAGES.automationNerves,
     loop: NV11_LOOPS.synapseBurst,
-    pinVh: 120,
+    pinVh: 90,
     nextHue: 285,
   },
   C11: {
@@ -170,7 +168,7 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     bg: NV11_IMAGES.analyticsHolo,
     loop: NV11_LOOPS.chartsBreathe,
     f2f: "NV11-F2F-003",
-    pinVh: 170,
+    pinVh: 115,
     nextHue: 230,
   },
   C12: {
@@ -178,7 +176,7 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     domId: "cena-beneficios",
     bg: NV11_IMAGES.constellation,
     loop: NV11_LOOPS.starsPulse,
-    pinVh: 120,
+    pinVh: 90,
     nextHue: 190,
   },
   C13: {
@@ -186,7 +184,7 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     domId: "cena-antes-depois",
     bg: NV11_IMAGES.beforeChaos,
     loop: NV11_LOOPS.splitMist,
-    pinVh: 140,
+    pinVh: 100,
     nextHue: 160,
   },
   C14: {
@@ -219,7 +217,7 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     domId: "cena-agencia",
     bg: NV11_IMAGES.agencyPortal,
     loop: NV11_LOOPS.portalGrid,
-    pinVh: 140,
+    pinVh: 100,
     nextHue: 250,
   },
   C18: {
@@ -227,7 +225,7 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     domId: "cena-planos",
     bg: NV11_IMAGES.plansConvergence,
     loop: NV11_LOOPS.decisionRings,
-    pinVh: 150,
+    pinVh: 100,
     nextHue: 250,
   },
   C19: {
@@ -236,8 +234,19 @@ export const NV11_SCENE_ASSETS: Record<string, Nv11SceneAssets> = {
     bg: NV11_IMAGES.ctaConvergence,
     loop: NV11_LOOPS.goldRivers,
     f2f: "NV11-F2F-004",
-    pinVh: 170,
-    pinMobileVh: 140,
+    pinVh: 130,
+    pinMobileVh: 110,
+  },
+  /** Prova unificada — cases + social */
+  C20: {
+    id: "C20",
+    domId: "cena-prova",
+    bg: NV11_IMAGES.casesVerticals,
+    loop: NV11_LOOPS.trustGather,
+    loopOpacity: 0.32,
+    pinVh: 115,
+    pinMobileVh: 95,
+    nextHue: 250,
   },
 };
 

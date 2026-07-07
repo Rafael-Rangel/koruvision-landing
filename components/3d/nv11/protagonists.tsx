@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode, type CSSProperties } from "react";
 import { usePointerParallax } from "@/hooks/usePointerParallax";
-import { smoothrange } from "@/lib/motion-system";
+import { smoothrange, lerp } from "@/lib/motion-system";
 import { gsap } from "@/lib/gsap/register";
 
 /** CSS custom properties must be stable strings (SSR ↔ client hydration). */
@@ -182,21 +182,54 @@ export function OperationalFogField({ progress = 0 }: { progress?: number }) {
 }
 
 /* ─── C04 Pilares ─── */
-const PILLAR_LABELS = ["Atendimento", "Inteligência", "Pipeline", "Automação"];
+const PILLAR_DUELS = [
+  { title: "Atendimento", pain: "WhatsApp solto", peak: 0.72 },
+  { title: "Inteligência", pain: "Lead sem score", peak: 0.88 },
+  { title: "Pipeline", pain: "Funil cego", peak: 1 },
+  { title: "Automação", pain: "Tarefa manual", peak: 0.8 },
+] as const;
+
 export function FourPillars3D({ progress = 0 }: { progress?: number }) {
-  const rise = smoothrange(progress, 0.1, 0.5);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const hubGlow = smoothrange(progress, 0.35, 0.85);
+  const spine = smoothrange(progress, 0.45, 0.92);
+
+  useEffect(() => {
+    const root = stageRef.current;
+    if (!root) return;
+    root.querySelectorAll<HTMLElement>(".pillar-3d").forEach((pillar, i) => {
+      const rise = smoothrange(progress, 0.06 + i * 0.1, 0.32 + i * 0.1);
+      const lit = smoothrange(progress, 0.22 + i * 0.14, 0.5 + i * 0.14);
+      gsap.set(pillar, {
+        scaleY: 0.15 + rise * PILLAR_DUELS[i].peak,
+        boxShadow: `0 0 ${16 + lit * 36}px rgba(${lit > 0.45 ? "255,194,51" : "139,92,246"},${0.2 + lit * 0.45})`,
+      });
+    });
+    const hub = root.querySelector(".pillars-3d__hub") as HTMLElement | null;
+    if (hub) {
+      gsap.set(hub, { scale: 0.85 + hubGlow * 0.35, opacity: 0.35 + hubGlow * 0.65 });
+    }
+  }, [progress, hubGlow]);
+
   return (
-    <ProtagonistStage className="pillars-3d" progress={progress}>
-      <div className="pillars-3d__hub" style={{ opacity: rise }} />
-      {PILLAR_LABELS.map((label, i) => (
-        <div
-          key={label}
-          className="pillar-3d"
-          style={{ "--i": cssIndex(i), "--h": cssPct(rise * 100, 2) } as CSSProperties}
-        >
-          <span>{label}</span>
-        </div>
-      ))}
+    <ProtagonistStage className="pillars-3d-wrap" progress={progress}>
+      <div ref={stageRef} className="pillars-3d">
+        <div className="pillars-3d__hub" style={{ opacity: hubGlow }} aria-hidden />
+        <div className="pillars-3d__spine" style={{ opacity: spine, transform: `scaleY(${spine})` }} aria-hidden />
+        {PILLAR_DUELS.map((pillar, i) => {
+          const lit = smoothrange(progress, 0.22 + i * 0.14, 0.5 + i * 0.14);
+          return (
+            <div
+              key={pillar.title}
+              className={`pillar-3d${lit > 0.45 ? " is-active" : ""}`}
+              style={{ "--i": cssIndex(i) } as CSSProperties}
+            >
+              <span className="pillar-3d__pain">{pillar.pain}</span>
+              <span className="pillar-3d__label">{pillar.title}</span>
+            </div>
+          );
+        })}
+      </div>
     </ProtagonistStage>
   );
 }
@@ -218,24 +251,86 @@ export function OnboardingPortals3D({ progress = 0 }: { progress?: number }) {
 
 /* ─── C07 Cérebro ─── */
 const AGENTS = ["SDR IA", "Closer", "Suporte", "Analytics"];
+const BRAIN_NODE_POS = [
+  { left: 18, top: 22 },
+  { left: 72, top: 18 },
+  { left: 14, top: 68 },
+  { left: 76, top: 72 },
+];
+
 export function NeuralBrainHub3D({ progress = 0 }: { progress?: number }) {
+  const hubRef = useRef<HTMLDivElement>(null);
   const on = smoothrange(progress, 0.15, 0.45);
+
+  useEffect(() => {
+    const root = hubRef.current;
+    if (!root) return;
+    const core = root.querySelector(".brain-hub__core") as HTMLElement | null;
+    if (core) {
+      gsap.set(core, { scale: 0.88 + on * 0.22, rotateZ: Math.sin(progress * Math.PI * 2) * 2 });
+    }
+    root.querySelectorAll<HTMLElement>(".brain-agent").forEach((node, i) => {
+      const nodeOn = smoothrange(progress, 0.25 + i * 0.08, 0.55 + i * 0.08);
+      const pulse = 1 + Math.sin(progress * 14 + i) * 0.04 * nodeOn;
+      gsap.set(node, {
+        scale: (0.9 + nodeOn * 0.14) * pulse,
+        boxShadow: `0 0 ${12 + nodeOn * 28}px rgba(139,92,246,${0.25 + nodeOn * 0.45})`,
+      });
+    });
+  }, [progress, on]);
+
   return (
     <ProtagonistStage className="brain-hub" progress={progress}>
-      <div className="brain-hub__core" style={{ opacity: on, boxShadow: `0 0 ${40 + on * 60}px rgba(139,92,246,${0.4 + on * 0.4})` }} />
-      {AGENTS.map((a, i) => (
-        <div key={a} className="brain-agent" style={{ "--a": i, opacity: smoothrange(progress, 0.3 + i * 0.08, 0.5 + i * 0.08) } as CSSProperties}>
-          {a}
-        </div>
-      ))}
+      <div ref={hubRef} className="brain-hub__mesh">
+        <div className="brain-hub__core" style={{ opacity: on, boxShadow: `0 0 ${40 + on * 60}px rgba(139,92,246,${0.4 + on * 0.4})` }} />
+        {AGENTS.map((a, i) => (
+          <div
+            key={a}
+            className="brain-agent"
+            style={
+              {
+                "--a": i,
+                left: `${BRAIN_NODE_POS[i].left}%`,
+                top: `${BRAIN_NODE_POS[i].top}%`,
+                opacity: smoothrange(progress, 0.3 + i * 0.08, 0.5 + i * 0.08),
+              } as CSSProperties
+            }
+          >
+            {a}
+          </div>
+        ))}
+      </div>
     </ProtagonistStage>
   );
 }
 
 /* ─── C09 Funil ─── */
 const STAGES = ["Lead", "Qualificação", "Proposta", "Negociação", "Fechado"];
+const PIPELINE_X = [12, 28, 44, 60, 76];
+const PIPELINE_Y = [20, 32, 44, 56, 68];
+
 export function SalesPipeline3D({ progress = 0 }: { progress?: number }) {
-  const stageIdx = Math.min(4, Math.floor(progress * 5));
+  const dealRef = useRef<HTMLDivElement>(null);
+  const stageFloat = Math.min(4, progress * 4.2);
+  const stageIdx = Math.min(4, Math.floor(stageFloat));
+
+  useEffect(() => {
+    const deal = dealRef.current;
+    if (!deal) return;
+    const i = Math.min(PIPELINE_X.length - 2, Math.max(0, Math.floor(stageFloat)));
+    const t = stageFloat - i;
+    const left = lerp(PIPELINE_X[i], PIPELINE_X[i + 1], t);
+    const top = lerp(PIPELINE_Y[i], PIPELINE_Y[i + 1], t) + Math.sin(progress * 18) * 1.2;
+    gsap.to(deal, {
+      left: `${left}%`,
+      top: `${top}%`,
+      scale: 1 + smoothrange(progress, 0.7, 1) * 0.06,
+      duration: 0.55,
+      ease: "power3.out",
+      overwrite: "auto",
+    });
+  }, [progress, stageFloat]);
+
   return (
     <ProtagonistStage className="pipeline-3d" progress={progress}>
       {STAGES.map((s, i) => (
@@ -243,7 +338,7 @@ export function SalesPipeline3D({ progress = 0 }: { progress?: number }) {
           <span>{s}</span>
         </div>
       ))}
-      <div className="pipeline-deal" style={{ "--stage": stageIdx } as CSSProperties}>
+      <div ref={dealRef} className="pipeline-deal pipeline-deal--motion">
         Maria S. · R$ 2.400
       </div>
     </ProtagonistStage>

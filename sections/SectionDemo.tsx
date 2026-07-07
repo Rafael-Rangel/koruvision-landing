@@ -11,6 +11,8 @@ import {
   UICalendarView,
 } from "@/components/golden/GoldenUI";
 import { MacInboxMockup, MacAutomationMockup, MacMetricsMockup } from "@/components/product/MacWindowMockup";
+import { RealProductScreen } from "@/components/product/RealProductScreen";
+import type { RealAssetSlot } from "@/config/real-assets";
 import { InteractiveSurface } from "@/components/motion/InteractiveSurface";
 import { usePinSection } from "@/lib/hooks/useGsapContext";
 import { elementState, smoothrange, smoothstep, lerp } from "@/lib/motion-system";
@@ -24,13 +26,25 @@ const ACTS = [
   { label: "Dashboard", copy: "Pipeline R$ 47.800 e conversão 23% — visão executiva completa." },
 ];
 
+const DEMO_SLOTS: RealAssetSlot[] = [
+  "demo.whatsapp",
+  "demo.ia",
+  "demo.kanban",
+  "demo.calendar",
+  "demo.dashboard",
+];
+
 const ACT_UI = [
   <MacInboxMockup key="wa" tilt={false} />,
   <MacAutomationMockup key="ia" tilt={false} />,
   <UIKanbanBoard key="kb" />,
   <UICalendarView key="cal" />,
   <MacMetricsMockup key="dash" tilt={false} />,
-];
+].map((ui, i) => (
+  <RealProductScreen key={DEMO_SLOTS[i]} slot={DEMO_SLOTS[i]}>
+    {ui}
+  </RealProductScreen>
+));
 
 const CAM = [
   { z: -40, ry: -12, rx: 8, scale: 0.92 },
@@ -128,8 +142,22 @@ export function SectionDemo({ cfg: cfgOverride }: { cfg?: SectionConfig }) {
 
     const cta = root.querySelector(".s04-cta-wrap");
     if (cta) {
-      const show = idx === ACTS.length - 1 && local > 0.35;
-      gsap.set(cta, { opacity: show ? smoothrange(local, 0.35, 0.65) : 0, y: show ? 0 : 12 });
+      const show = idx >= 2;
+      const fadeIn =
+        idx === ACTS.length - 1 ? smoothrange(local, 0.18, 0.48) : idx >= 2 ? 0.92 : 0;
+      gsap.set(cta, { opacity: show ? fadeIn : 0, y: show ? 0 : 14 });
+      cta.classList.toggle("s04-cta-wrap--visible", show && fadeIn > 0.4);
+    }
+
+    const actBar = root.querySelector(".s04-act-progress");
+    if (actBar) {
+      actBar.querySelectorAll<HTMLElement>(".s04-act-progress__seg").forEach((seg, i) => {
+        const fill =
+          i < idx ? 1 : i === idx ? Math.max(0.2, local) : 0;
+        seg.style.setProperty("--fill", String(fill));
+        seg.classList.toggle("is-active", i === idx);
+        seg.classList.toggle("is-done", i < idx);
+      });
     }
 
     const chips = root.querySelectorAll(".s04-float-chip");
@@ -210,6 +238,11 @@ export function SectionDemo({ cfg: cfgOverride }: { cfg?: SectionConfig }) {
                 >
                   {a.label}
                 </span>
+              ))}
+            </div>
+            <div className="s04-act-progress" aria-hidden>
+              {ACTS.map((a) => (
+                <span key={a.label} className="s04-act-progress__seg" />
               ))}
             </div>
             <p className="act-copy">{ACTS[displayAct].copy}</p>

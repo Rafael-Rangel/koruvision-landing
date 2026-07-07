@@ -6,6 +6,7 @@ import { usePinSection } from "@/lib/hooks/useGsapContext";
 import { OwlSigil } from "@/components/motion/OwlSigil";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import { ProceduralOwlScene } from "@/components/motion/ProceduralOwlScene";
+import { SectionMediaLayers } from "@/components/motion/SectionMediaLayers";
 import { MacMetricsMockup } from "@/components/product/MacWindowMockup";
 import { gsap } from "@/lib/gsap/register";
 import { smoothrange } from "@/lib/motion-system";
@@ -36,6 +37,7 @@ export function SectionEcosystemCta({ cfg }: { cfg: SectionConfig }) {
   return (
     <PinWrap id="s-cta-eco" pinVh={cfg.pinVh}>
       <div ref={pinRef} className="pin-section s-eco-cta" id="s-cta-eco">
+        <SectionMediaLayers cfg={cfg} progress={progress} variant="cta" f2fBlend="screen" />
         <div className="readability-scrim readability-scrim--cta" aria-hidden />
         <div className="s-eco-cta-owl" style={{ opacity: 0.35 + progress * 0.45 }}>
           <ProceduralOwlScene intensity={0.9 + progress * 0.1} />

@@ -103,6 +103,41 @@
 .s04-cta-wrap {
   opacity: 0;
   min-height: 48px;
+  transition: opacity 0.25s ease;
+}
+.s04-cta-wrap--visible {
+  position: sticky;
+  bottom: clamp(8px, 1.5vh, 16px);
+  z-index: 4;
+  padding-top: 8px;
+  background: linear-gradient(180deg, transparent, rgba(3, 6, 15, 0.85) 35%);
+}
+.s04-act-progress {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 12px;
+  width: 100%;
+  max-width: 280px;
+}
+.s04-act-progress__seg {
+  flex: 1;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  position: relative;
+}
+.s04-act-progress__seg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: calc(var(--fill, 0) * 100%);
+  background: linear-gradient(90deg, #2ee8c0, #8b5cf6);
+  border-radius: inherit;
+  transition: width 0.15s ease;
+}
+.s04-act-progress__seg.is-active::after {
+  box-shadow: 0 0 10px rgba(46, 232, 192, 0.45);
 }
 
 .act-nav { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }

@@ -74,6 +74,11 @@ html.lenis body {
     radial-gradient(ellipse 90% 50% at 50% 0%, hsla(var(--continuity-hue), 70%, 50%, 0.08), transparent 55%),
     #03060F;
 }
+.section-continuity--flush {
+  margin-top: 0;
+  position: relative;
+  z-index: 1;
+}
 
 /* Hero Experience */
 .hero-experience {

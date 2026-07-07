@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ReactNode, CSSProperties } from "react";
 import { FrameScrubber } from "@/components/motion/FrameScrubber";
 import { SmartVideo } from "@/components/performance/SmartVideo";
 import { env } from "@/config/env";
@@ -16,6 +16,8 @@ export interface SceneCinemaLayerProps {
   progress?: number;
   f2fBlend?: "normal" | "screen" | "overlay";
   handoffGlow?: number;
+  layerOpacity?: number;
+  enterMist?: number;
   className?: string;
   children?: ReactNode;
   assetBase?: string;
@@ -34,6 +36,7 @@ export function SceneCinemaLayer({
   progress = 0,
   f2fBlend = "screen",
   handoffGlow = 0,
+  layerOpacity = 1,
   className = "",
   children,
   assetBase = NV11_BASE,
@@ -43,7 +46,11 @@ export function SceneCinemaLayer({
   const vid = (file: string) => (base === NV11_BASE ? nv11Video(file) : `${base}/videos/${file}`);
 
   return (
-    <div className={`scene-cinema-layer ${className}`} aria-hidden={!children}>
+    <div
+      className={`scene-cinema-layer ${className}`}
+      style={{ opacity: layerOpacity } as CSSProperties}
+      aria-hidden={!children}
+    >
       {bg && (
         <div className="scene-cinema-bg" data-ambient-breathe>
           {/* eslint-disable-next-line @next/next/no-img-element */}

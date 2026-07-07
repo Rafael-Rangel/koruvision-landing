@@ -1,6 +1,6 @@
 /**
- * KORUVISION — Landing definitiva (19 cenas, produto-first)
- * Roteiro cinematografico continuo. Configs de cena + copy premium PT-BR.
+ * KORUVISION — Landing V3 (10 seções + CTA)
+ * Estratégia: docs/LANDING-STRATEGY-V3.md · Metadados: config/landing-strategy.ts
  */
 import type { SectionConfig } from "./sections";
 import { NV11_S01, NV11_S02, NV11_S04, NV11_CTA } from "./test-preview-nv11";
@@ -14,6 +14,8 @@ export interface SceneCopy {
   eyebrow: string;
   headline: string;
   headlineEm?: string;
+  /** Quebra de linha antes do trecho em destaque (ex.: "na névoa operacional.") */
+  headlineBreakBeforeEm?: boolean;
   subheadline: string;
   ctaPrimary?: string;
   ctaPrimaryHref?: string;
@@ -54,7 +56,7 @@ export const DEMO_CFG: SectionConfig = {
   headline: "Cinco atos,",
   headlineEm: "um único fluxo.",
   subheadline:
-    "Do primeiro 'oi' no WhatsApp ao deal fechado no dashboard — role e percorra o produto em operação real.",
+    "Do primeiro 'oi' no WhatsApp ao deal fechado no dashboard — inbox, IA, funil e automação numa só passagem.",
   ctaPrimary: "Quero esse fluxo na minha operação",
   scrub: PREMIUM_SCRUB.demo,
 };
@@ -189,7 +191,23 @@ export const BEFORE_AFTER_CFG: SceneCopy = {
   headline: "O mesmo negócio,",
   headlineEm: "dois universos.",
   subheadline:
-    "Arraste a linha e veja a diferença entre operar no escuro e operar com a KORUVISION.",
+    "Arraste a linha e sinta a diferença entre operar no escuro e operar com método.",
+  ctaPrimary: "Quero o depois",
+  ctaPrimaryHref: CTA_PLANS,
+};
+
+/** Cases + social proof unificados */
+export const PROOF_CFG: SceneCopy = {
+  id: "cena-prova",
+  hue: 160,
+  eyebrow: "Prova real",
+  headline: "Resultados que",
+  headlineEm: "falam por si.",
+  subheadline:
+    "Saúde, imóveis, consultoria, agências e e-commerce — times reais, métricas reais, mesmo fluxo que vende.",
+  ctaPrimary: "Ver planos",
+  ctaPrimaryHref: CTA_PLANS,
+  points: ["+2.400 equipes ativas", "23% conversão média", "12M+ mensagens/mês", "4,9/5 satisfação"],
 };
 
 export const CASES_CFG: SceneCopy = {
@@ -245,7 +263,9 @@ export const PLANS_CFG: SceneCopy = {
   headline: "Escolha seu plano.",
   headlineEm: "Escale quando quiser.",
   subheadline:
-    "Comece grátis por 14 dias, sem cartão. Sem surpresas na fatura — você cresce, o plano acompanha.",
+    "14 dias grátis, sem cartão. Starter para começar · Pro para escalar · Agency para multi-cliente com white-label.",
+  ctaPrimary: "Começar grátis",
+  ctaPrimaryHref: CTA_FINAL,
   bg: `${NV11_BG}/${NV11_IMAGES.plansConvergence}`,
 };
 

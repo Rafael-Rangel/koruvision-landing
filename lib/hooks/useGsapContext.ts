@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import type { ScrollTrigger as ST } from "gsap/ScrollTrigger";
 import { gsap, registerGsap, ScrollTrigger } from "@/lib/gsap/register";
 import { PREMIUM_SMOOTH_DURATION } from "@/lib/lenis-scroll";
+import { remapHeldPinProgress } from "@/lib/scene-choreography";
 
 export function useGsapContext(
   setup: () => void | (() => void),
@@ -33,11 +34,35 @@ export interface PinOptions {
   onUpdate?: (progress: number, self: ST) => void;
   /** Interpola progresso após scroll parar (fluido). 0 = desligado */
   smoothDuration?: number;
+  anticipatePin?: number;
+  fastScrollEnd?: boolean;
+  onPinChange?: (pinned: boolean) => void;
+  /** ScrollTrigger start — padrão quando o topo da seção encosta no topo da viewport */
+  start?: string;
+  /** Só inicia o pin depois que o seletor (ex. #s02-vision-pin) sair da tela */
+  pinAfter?: string;
+  /** Fração inicial do pin (0–1) em que o progresso permanece em 0 */
+  progressHold?: number;
 }
+
+const LENIS_SCROLLER =
+  typeof document !== "undefined" ? document.documentElement : undefined;
 
 export function usePinSection(
   ref: React.RefObject<HTMLElement | null>,
-  { pinVh, pinMobileVh, scrub = 0.34, onUpdate, smoothDuration = PREMIUM_SMOOTH_DURATION }: PinOptions,
+  {
+    pinVh,
+    pinMobileVh,
+    scrub = 0.34,
+    onUpdate,
+    smoothDuration = PREMIUM_SMOOTH_DURATION,
+    anticipatePin = 1,
+    fastScrollEnd = true,
+    onPinChange,
+    start = "top top",
+    pinAfter,
+    progressHold = 0,
+  }: PinOptions,
   deps: unknown[] = []
 ) {
   useEffect(() => {
@@ -45,48 +70,82 @@ export function usePinSection(
     const el = ref.current;
     if (!el || !onUpdate) return;
 
-    const isMobile = window.matchMedia("(max-width: 900px)").matches;
-    const endVh = isMobile ? (pinMobileVh ?? Math.round(pinVh * 0.6)) : pinVh;
-    const scrubVal = isMobile
-      ? typeof scrub === "number"
-        ? scrub * 0.85
-        : scrub
-      : scrub;
+    let st: ST | null = null;
+    let raf = 0;
+    let cancelled = false;
 
-    const smooth = { p: 0 };
-    let lastSelf: ST | null = null;
+    const attach = () => {
+      if (cancelled) return;
 
-    const quickProgress =
-      smoothDuration > 0
-        ? gsap.quickTo(smooth, "p", {
-            duration: smoothDuration,
-            ease: "power2.out",
-            onUpdate: () => {
-              if (lastSelf) onUpdate(smooth.p, lastSelf);
-            },
-          })
-        : null;
+      const afterEl = pinAfter ? document.querySelector<HTMLElement>(pinAfter) : null;
+      if (pinAfter && !afterEl) {
+        raf = requestAnimationFrame(attach);
+        return;
+      }
 
-    const st = ScrollTrigger.create({
-      trigger: el,
-      start: "top top",
-      end: `+=${endVh}%`,
-      pin: true,
-      scrub: scrubVal,
-      anticipatePin: 1,
-      invalidateOnRefresh: true,
-      fastScrollEnd: true,
-      onUpdate: (self) => {
-        lastSelf = self;
-        if (quickProgress) {
-          quickProgress(self.progress);
-        } else {
-          onUpdate(self.progress, self);
-        }
-      },
-    });
+      const triggerEl = afterEl ?? el;
+      const triggerStart = afterEl ? "bottom top" : start;
 
-    return () => st.kill();
+      const isMobile = window.matchMedia("(max-width: 900px)").matches;
+      const endVh = isMobile ? (pinMobileVh ?? Math.round(pinVh * 0.6)) : pinVh;
+      const scrubVal = isMobile
+        ? typeof scrub === "number"
+          ? scrub * 0.85
+          : scrub
+        : scrub;
+
+      const smooth = { p: 0 };
+      let lastSelf: ST | null = null;
+
+      const mapProgress = (raw: number) =>
+        progressHold > 0 ? remapHeldPinProgress(raw, progressHold) : raw;
+
+      const quickProgress =
+        smoothDuration > 0
+          ? gsap.quickTo(smooth, "p", {
+              duration: smoothDuration,
+              ease: "power2.out",
+              onUpdate: () => {
+                if (lastSelf) onUpdate(smooth.p, lastSelf);
+              },
+            })
+          : null;
+
+      st = ScrollTrigger.create({
+        trigger: triggerEl,
+        scroller: LENIS_SCROLLER,
+        start: triggerStart,
+        end: `+=${endVh}%`,
+        pin: el,
+        scrub: scrubVal,
+        anticipatePin,
+        invalidateOnRefresh: true,
+        fastScrollEnd,
+        onUpdate: (self) => {
+          lastSelf = self;
+          const mapped = mapProgress(self.progress);
+          if (progressHold > 0 && self.progress <= progressHold) {
+            smooth.p = 0;
+          }
+          if (quickProgress) {
+            quickProgress(mapped);
+          } else {
+            onUpdate(mapped, self);
+          }
+        },
+        onToggle: (self) => onPinChange?.(self.isActive),
+      });
+
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+    };
+
+    attach();
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      st?.kill();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }

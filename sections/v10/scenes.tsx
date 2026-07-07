@@ -15,9 +15,11 @@ import {
   AgencyVisual,
   PlansVisual,
   SetupVisual,
+  ProofVisual,
+  PillarsVisual,
 } from "@/components/scenes/SceneWidgets";
+import { OperationalChaos3D } from "@/components/hero/OperationalChaos3D";
 import {
-  OperationalFogField,
   FourPillars3D,
   OnboardingPortals3D,
   NeuralBrainHub3D,
@@ -46,6 +48,7 @@ import {
   SOCIAL_CFG,
   INTEGRATIONS_CFG,
   AGENCY_CFG,
+  PROOF_CFG,
   PLANS_CFG,
 } from "@/config/landing-v10";
 
@@ -54,22 +57,60 @@ function PinnedScene({
   copy,
   layout = "split",
   visualFirst = false,
+  unifiedCard = false,
   protagonist,
   extra,
+  blendEnter = false,
+  embedded = false,
+  rawProgress = 0,
+  animProgress = 0,
+  irisReveal = 0,
+  pointsBar = false,
+  progressHold,
+  pinAfter = "#s02-vision-pin",
 }: {
   sceneKey: keyof typeof NV11_SCENE_ASSETS;
   copy: typeof PROBLEM_CFG;
   layout?: "split" | "stack" | "center";
   visualFirst?: boolean;
+  unifiedCard?: boolean;
   protagonist: (ctx: { progress: number }) => React.ReactNode;
   extra?: React.ReactNode;
+  blendEnter?: boolean;
+  embedded?: boolean;
+  rawProgress?: number;
+  animProgress?: number;
+  irisReveal?: number;
+  pointsBar?: boolean;
+  progressHold?: number;
+  pinAfter?: string;
 }) {
   const scene = NV11_SCENE_ASSETS[sceneKey];
   return (
-    <SceneCinemaSection scene={scene} hue={copy.hue} className={`scene--nv11 scene--${copy.id}`}>
+    <SceneCinemaSection
+      scene={scene}
+      hue={copy.hue}
+      className={`scene--nv11 scene--${copy.id}`}
+      blendEnter={blendEnter}
+      embedded={embedded}
+      rawProgress={rawProgress}
+      animProgress={animProgress}
+      irisReveal={irisReveal}
+      pin={!embedded}
+      pinStart="top top"
+      pinAfter={pinAfter}
+      progressHold={progressHold}
+    >
       {({ progress }) => (
         <div className="scene-pinned-grid">
-          <SceneScaffold copy={copy} layout={layout} visualFirst={visualFirst} className="scene-scaffold--overlay">
+          <SceneScaffold
+            copy={copy}
+            layout={layout}
+            visualFirst={visualFirst}
+            unifiedCard={unifiedCard}
+            className="scene-scaffold--overlay"
+            pointsBar={pointsBar}
+          >
             {protagonist({ progress })}
           </SceneScaffold>
           {extra}
@@ -79,20 +120,62 @@ function PinnedScene({
   );
 }
 
-export function SceneProblem() {
+export function SceneProblem({
+  copy = PROBLEM_CFG,
+  pointsBar = false,
+  unifiedCard = false,
+  embedded = false,
+  blendEnter = false,
+  rawProgress = 0,
+  animProgress = 0,
+  irisReveal = 0,
+  progressHold = unifiedCard && !embedded ? 0.42 : embedded ? 0 : 0.28,
+  pinAfter = embedded ? undefined : "#s02-vision-pin",
+}: {
+  copy?: typeof PROBLEM_CFG;
+  pointsBar?: boolean;
+  unifiedCard?: boolean;
+  embedded?: boolean;
+  blendEnter?: boolean;
+  rawProgress?: number;
+  animProgress?: number;
+  irisReveal?: number;
+  progressHold?: number;
+  pinAfter?: string;
+} = {}) {
   return (
     <PinnedScene
       sceneKey="C03"
-      copy={PROBLEM_CFG}
+      copy={copy}
       layout="split"
-      protagonist={({ progress }) => <OperationalFogField progress={progress} />}
+      unifiedCard={unifiedCard}
+      pointsBar={pointsBar}
+      embedded={embedded}
+      blendEnter={blendEnter}
+      rawProgress={rawProgress}
+      animProgress={animProgress}
+      irisReveal={irisReveal}
+      progressHold={progressHold}
+      pinAfter={pinAfter}
+      protagonist={({ progress }) => <OperationalChaos3D scrollProgress={progress} />}
     />
   );
 }
 
 export function ScenePillars() {
   return (
-    <PinnedScene sceneKey="C04" copy={PILLARS_CFG} layout="split" visualFirst protagonist={({ progress }) => <FourPillars3D progress={progress} />} />
+    <PinnedScene
+      sceneKey="C04"
+      copy={PILLARS_CFG}
+      layout="split"
+      visualFirst
+      protagonist={({ progress }) => (
+        <div className="pillars-scene-stack">
+          <FourPillars3D progress={progress} />
+          <PillarsVisual progress={progress} />
+        </div>
+      )}
+    />
   );
 }
 
@@ -177,6 +260,19 @@ export function SceneIntegrations() {
 export function SceneAgency() {
   return (
     <PinnedScene sceneKey="C17" copy={AGENCY_CFG} protagonist={({ progress }) => <AgencyPortal3D progress={progress} />} extra={<AgencyVisual />} />
+  );
+}
+
+export function SceneProof() {
+  return (
+    <PinnedScene
+      sceneKey="C20"
+      copy={PROOF_CFG}
+      layout="split"
+      visualFirst
+      protagonist={({ progress }) => <VerticalTotems3D progress={progress} />}
+      extra={<ProofVisual />}
+    />
   );
 }
 

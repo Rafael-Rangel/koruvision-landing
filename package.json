@@ -14,7 +14,8 @@
     "generate:nv11": "python scripts/nv11_pipeline.py",
     "generate:nv11:priority": "python scripts/nv11_pipeline.py --priority",
     "generate:nv11:bootstrap": "python scripts/nv11_bootstrap.py",
-    "generate:nv11:f2f": "python scripts/nv11_pipeline.py --f2f-only"
+    "generate:nv11:f2f": "python scripts/nv11_pipeline.py --f2f-only",
+    "f2f:owl": "python scripts/nv11_pipeline.py --f2f-only --force --lite --seq NV11-F2F-001"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

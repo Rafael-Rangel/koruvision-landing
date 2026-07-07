@@ -9,10 +9,43 @@
 html { scroll-behavior: auto; }
 
 body {
-  font-family: var(--font-inter, Inter), system-ui, sans-serif;
+  font-family: var(--font-body);
   background: #03060F;
   color: #F0F4FF;
   overflow-x: hidden;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.section-headline,
+.scene-headline,
+.eyebrow,
+.s02-vision-headline,
+.s02-vision-eyebrow,
+.lps-headline,
+.lps-eyebrow,
+.nav-brand,
+.lps-nav__brand,
+.btn-primary,
+.btn-ghost,
+.magnetic-btn,
+.lps-btn {
+  font-family: var(--font-display);
+}
+
+p,
+.section-lede,
+.lps-sub,
+.s02-vision-lede,
+.scene-points li,
+.nav-links a,
+.lps-nav__links a {
+  font-family: var(--font-body);
 }
 
 main { position: relative; z-index: 2; }

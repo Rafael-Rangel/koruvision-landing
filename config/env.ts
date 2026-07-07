@@ -12,12 +12,14 @@ export function assetPath(...parts: string[]): string {
   return `${base}/${parts.join("/").replace(/^\//, "")}`;
 }
 
-export function imagePath(filename: string, base?: string): string {
+export function imagePath(filename: string | undefined | null, base?: string): string {
+  if (!filename) return "";
   const root = (base ?? env.assetBase).replace(/\/$/, "");
   return `${root}/images/${filename.replace(/^\//, "")}`;
 }
 
-export function videoPath(filename: string, base?: string): string {
+export function videoPath(filename: string | undefined | null, base?: string): string {
+  if (!filename) return "";
   const root = (base ?? env.assetBase).replace(/\/$/, "");
   return `${root}/videos/${filename.replace(/^\//, "")}`;
 }

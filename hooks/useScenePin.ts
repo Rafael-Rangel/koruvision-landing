@@ -9,6 +9,9 @@ interface UseScenePinOptions {
   pinMobileVh?: number;
   scrub?: number | boolean;
   enabled?: boolean;
+  start?: string;
+  pinAfter?: string;
+  progressHold?: number;
 }
 
 export function useScenePin({
@@ -16,6 +19,9 @@ export function useScenePin({
   pinMobileVh,
   scrub = PREMIUM_SCRUB.scene,
   enabled = true,
+  start,
+  pinAfter,
+  progressHold,
 }: UseScenePinOptions) {
   const pinRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
@@ -27,9 +33,12 @@ export function useScenePin({
       pinMobileVh: pinMobileVh ?? Math.round(pinVh * 0.78),
       scrub,
       smoothDuration: PREMIUM_SMOOTH_DURATION,
+      start,
+      pinAfter,
+      progressHold,
       onUpdate: (p) => setProgress(p),
     },
-    [pinVh, pinMobileVh, scrub, enabled]
+    [pinVh, pinMobileVh, scrub, enabled, start, pinAfter, progressHold]
   );
 
   return { pinRef, progress };

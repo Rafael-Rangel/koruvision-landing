@@ -1,5 +1,7 @@
 # KORUVISION — Matriz de Protagonistas Visuais (19 Cenas)
 
+> **Superseded:** A landing ativa segue **Landing Strategy V3** — ver [`LANDING-STRATEGY-V3.md`](LANDING-STRATEGY-V3.md) e [`config/landing-strategy.ts`](../config/landing-strategy.ts). Este documento permanece como referência histórica das 19 cenas.
+
 > **Versão:** 2.1 · Complemento do [Documento Mestre](KORUVISION-Experience-Master-Document.md)  
 > **Specs profundas (todas as 19 cenas no nível Hero):** [KORUVISION-Scene-Deep-Specs.md](KORUVISION-Scene-Deep-Specs.md)  
 > **Regra:** Nenhuma seção depende apenas de imagem estática. Cada cena tem **um protagonista** claramente definido.  

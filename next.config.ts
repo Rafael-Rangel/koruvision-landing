@@ -5,7 +5,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: path.join(process.cwd()),
   async redirects() {
-    return [{ source: "/favicon.ico", destination: "/favicon.svg", permanent: false }];
+    return [
+      { source: "/favicon.ico", destination: "/favicon.svg", permanent: false },
+      { source: "/landing-page-simples", destination: "/", permanent: true },
+    ];
   },
   images: {
     formats: ["image/webp", "image/avif"],

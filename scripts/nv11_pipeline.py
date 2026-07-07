@@ -33,7 +33,7 @@ GLOBAL_SUFFIX = (
 
 F2F_MAP = {
     "NV11-F2F-000": ("nv11-vid-f2f-000-hero-core.mp4", 72, 24),
-    "NV11-F2F-001": ("nv11-vid-f2f-001-owl-eyes.mp4", 90, 25),
+    "NV11-F2F-001": ("nv11-vid-f2f-001-owl-eyes.mp4", 120, 30),
     "NV11-F2F-002": ("nv11-vid-f2f-002-crm-awaken.mp4", 120, 24),
     "NV11-F2F-003": ("nv11-vid-f2f-003-data-evolution.mp4", 96, 24),
     "NV11-F2F-004": ("nv11-vid-f2f-004-cta-convergence.mp4", 80, 25),
@@ -113,7 +113,7 @@ def parse_videos(text: str) -> list[dict]:
     return items
 
 
-def extract_f2f(seq_id: str, force: bool = False) -> int:
+def extract_f2f(seq_id: str, force: bool = False, lite: bool = False) -> int:
     if seq_id not in F2F_MAP:
         return 0
     video_name, max_frames, fps = F2F_MAP[seq_id]
@@ -127,8 +127,9 @@ def extract_f2f(seq_id: str, force: bool = False) -> int:
         return 0
     dest.mkdir(parents=True, exist_ok=True)
     pattern = str(dest / "frame_%04d.webp")
+    width = 1280 if lite else 1920
     subprocess.run(
-        ["ffmpeg", "-y", "-i", str(mp4), "-vf", f"fps={fps},scale=1920:-1",
+        ["ffmpeg", "-y", "-i", str(mp4), "-vf", f"fps={fps},scale={width}:-1",
          "-frames:v", str(max_frames), "-c:v", "libwebp", "-quality", "82", pattern],
         check=True, capture_output=True,
     )
@@ -147,7 +148,12 @@ def main() -> int:
 
     priority = "--priority" in sys.argv
     force = "--force" in sys.argv
+    lite = "--lite" in sys.argv
     only_f2f = "--f2f-only" in sys.argv
+    seq_filter = None
+    for i, arg in enumerate(sys.argv):
+        if arg == "--seq" and i + 1 < len(sys.argv):
+            seq_filter = sys.argv[i + 1]
 
     if "--bootstrap-only" in sys.argv:
         import nv11_bootstrap
@@ -205,8 +211,12 @@ def main() -> int:
             time.sleep(1.2)
 
     print("\n=== F2F EXTRACT ===")
-    for seq_id in F2F_MAP:
-        extract_f2f(seq_id, force)
+    targets = [seq_filter] if seq_filter else list(F2F_MAP.keys())
+    for seq_id in targets:
+        if seq_id not in F2F_MAP:
+            print(f"  F2F skip {seq_id}: sequencia desconhecida")
+            continue
+        extract_f2f(seq_id, force, lite)
 
     print("\nOK public/assets/nv11/")
     return 0
