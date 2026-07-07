@@ -87,7 +87,15 @@ export function LpsSplitSection({
         <div className="lps-split__media lps-reveal">
           <div className="lps-media-frame">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img ref={imgRef} src={image} alt="" loading="lazy" decoding="async" />
+            <img
+              ref={imgRef}
+              src={image}
+              alt=""
+              width={1600}
+              height={1200}
+              loading="lazy"
+              decoding="async"
+            />
             <div className="lps-media-frame__glow" aria-hidden />
           </div>
         </div>

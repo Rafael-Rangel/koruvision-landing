@@ -4,6 +4,7 @@ import { TokensProvider } from "@/components/providers/TokensProvider";
 import { SiteNav } from "@/components/layout/SiteNav";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { DataRiver } from "@/components/motion/DataRiver";
+import { fontClassNames } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: "KORUVISION — CRM + IA para WhatsApp",
@@ -16,15 +17,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="pt-BR" className={fontClassNames} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <TokensProvider>
           <DataRiver />

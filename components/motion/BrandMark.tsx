@@ -42,6 +42,9 @@ export function BrandMark({ variant = "hero", className = "" }: BrandMarkProps) 
           className="brand-mark-icon"
           src="/assets/brand/koruvision-logo.webp"
           alt=""
+          width={120}
+          height={120}
+          decoding="async"
           onError={(e) => {
             (e.target as HTMLImageElement).src = "/assets/brand/koruvision-logo.svg";
           }}

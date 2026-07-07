@@ -71,7 +71,7 @@ export function LpsProof() {
           <div className="lps-split__media lps-reveal">
             <div className="lps-media-frame">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={LPS_PROOF.image} alt="" loading="lazy" />
+              <img src={LPS_PROOF.image} alt="" width={1600} height={1200} loading="lazy" decoding="async" />
             </div>
           </div>
         </div>

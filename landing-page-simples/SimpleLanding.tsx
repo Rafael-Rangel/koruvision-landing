@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import dynamic from "next/dynamic";
 import type { CSSProperties } from "react";
 import { ScrollTrigger } from "@/lib/gsap/register";
 import { SectionHero } from "@/sections/SectionHero";
@@ -10,13 +11,14 @@ import { warmLandingAssets } from "@/lib/landing-preload";
 import { HERO_CFG } from "@/config/landing-v10";
 import { LpsPillars } from "./components/LpsPillars";
 import { LpsSplitSection } from "./components/LpsSplitSection";
-import { LpsProof } from "./components/LpsProof";
-import { LpsPlans } from "./components/LpsPlans";
-import { LpsCta } from "./components/LpsCta";
-import { LpsFaq } from "./components/LpsFaq";
 import { useLpsReveal } from "./hooks/useLpsReveal";
 import { LPS_FEATURES, LPS_PROBLEM_COPY } from "./config";
 import "./styles.css";
+
+const LpsProof = dynamic(() => import("./components/LpsProof").then((m) => ({ default: m.LpsProof })));
+const LpsPlans = dynamic(() => import("./components/LpsPlans").then((m) => ({ default: m.LpsPlans })));
+const LpsCta = dynamic(() => import("./components/LpsCta").then((m) => ({ default: m.LpsCta })));
+const LpsFaq = dynamic(() => import("./components/LpsFaq").then((m) => ({ default: m.LpsFaq })));
 
 function MorphBridge() {
   return <div className="section-morph-bridge" aria-hidden />;

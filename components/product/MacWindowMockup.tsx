@@ -63,6 +63,8 @@ export function MacWindowMockup({
                 src={imageSrc}
                 alt={imageAlt}
                 className="mac-window__screenshot"
+                width={1440}
+                height={900}
                 loading={priority ? "eager" : "lazy"}
                 decoding="async"
                 draggable={false}

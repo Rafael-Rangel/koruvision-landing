@@ -6,16 +6,15 @@ const nextConfig: NextConfig = {
   output: "standalone",
   outputFileTracingRoot: path.join(process.cwd()),
   async headers() {
-    return [
+    const longCache = [
       {
-        source: "/assets/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
+        key: "Cache-Control",
+        value: "public, max-age=31536000, immutable",
       },
+    ];
+    return [
+      { source: "/assets/:path*", headers: longCache },
+      { source: "/_next/static/:path*", headers: longCache },
     ];
   },
   async redirects() {

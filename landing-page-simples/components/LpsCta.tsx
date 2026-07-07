@@ -43,7 +43,7 @@ export function LpsCta() {
     <section className="lps-cta" id="lps-cta" ref={ref}>
       <div className="lps-cta__bg" aria-hidden>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={LPS_CTA.image} alt="" />
+        <img src={LPS_CTA.image} alt="" width={1920} height={1080} decoding="async" />
       </div>
       <div className="lps-cta__veil" aria-hidden />
       <div className="lps-cta__inner">
